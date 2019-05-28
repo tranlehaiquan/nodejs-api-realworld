@@ -2,12 +2,13 @@ import express from 'express';
 import index from './routers';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
-import { connectToClientDB } from './database';
+import database from './database';
 import path from 'path';
+ 
 
 // Load .env config
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
-connectToClientDB();
+database();
 
 const app = express();
 const port = process.env.PORT || '3000';

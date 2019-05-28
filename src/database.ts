@@ -1,18 +1,14 @@
-import mongodb from 'mongodb';
+import mongoose from 'mongoose';
+import './models/User';
 
-const { MongoClient } = mongodb;
-
-export const connectToClientDB = async () => {
+export default async () => {
   const databaseUri = process.env.DATABASE_URI || 'mongodb://localhost:27017/realworld-be';
-  
-  MongoClient.connect(databaseUri, {useNewUrlParser: true}, (error, client) => {
-    if(error) {
-      console.error(error);
 
-      return Promise.reject(new Error(error.message));
-    }
+  try {
+    await mongoose.connect(databaseUri, {useNewUrlParser: true});
+    console.log('Success connect to db');
 
-    console.log('Success connect to Datbase');
-    return client;
-  });
+  } catch(err) {
+    console.error('Failed to connect to database ', err);
+  }
 }
