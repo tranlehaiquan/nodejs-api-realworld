@@ -7,7 +7,7 @@
   "verbose": true,
   "watch": ["./src"],
   "execMap": {
-    "ts": "ts-node"
+    "ts": "node --require ts-node/register"
   },
   "ext": "ts,json"
 }

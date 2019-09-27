@@ -12,9 +12,13 @@
           "*": [
               "node_modules/*"
           ]
-      }
+      },
+      "typeRoots": [
+        "./types"
+      ]
   },
   "include": [
       "src/**/*"
-  ]
+  ],
+  "exclude": ["node_modules", "**/*.test.ts"]
 }

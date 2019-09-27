@@ -1,10 +1,13 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import crypto from 'crypto';
 
-export interface User extends Document {
+export interface IUser extends Document {
   email: string,
   username: string,
-  bio: string,
+  bio?: string,
   image?: string,
+  setPassword: (password: string) => void,
+  validatePassword: (password: string) => boolean,
 };
 
 const UserSchema = new Schema({
@@ -13,19 +16,51 @@ const UserSchema = new Schema({
     trim: true,
     required: true,
     lowercase: true,
+    index: true,
+    unique: 'Email không được trùng',
   },
   username: {
     type: String,
     required: true,
     trim: true,
+    index: true,
+    unique: 'Tài khoản không được trùng',
   },
-  bio: String,
+  bio: { type: String, default: '' },
   image: String,
   hash: String,
   salt: String,
+}, {
+  toObject: { transform: function(doc: IUser) {
+    return {
+      id: doc._id,
+      email: doc.email,
+      username: doc.username,
+      bio: doc.bio,
+      image: doc.image,
+    };
+  }},
+});
+
+UserSchema.methods.setPassword = function(password: string) {
+  this.salt = crypto.randomBytes(16).toString('hex');
+  this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+}
+
+UserSchema.methods.validatePassword = function(password: string): boolean {
+  const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+  return hash === this.hash;
+}
+
+UserSchema.pre('save', function(this: IUser, next) {
+  if(!this.image) {
+    const hashEmail = crypto.createHash('md5').update(this.email).digest('hex');
+    this.image = `https://gravatar.com/avatar/${hashEmail}?s=200`;
+  }
+  next();
 });
 
 /**
  * Use <User> to know to that return an User
  */
-export default mongoose.model<User>('User', UserSchema);
+export default mongoose.model<IUser>('User', UserSchema);

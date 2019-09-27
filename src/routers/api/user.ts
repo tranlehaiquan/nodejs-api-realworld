@@ -1,12 +1,13 @@
 import { Router } from 'express';
-import { login, register, getCurrentUserInfo, updateCurrentUserInfo } from '../../controllers/user';
+import { login, registerValidation ,register, getCurrentUserInfo, updateCurrentUserInfo, loginValidation, updateCurrentUserValidation } from '../../controllers/user';
+import { authenticate } from '../../middlewares/jwt';
 
 const route = Router();
 
 // api/user/
-route.get('/', getCurrentUserInfo);
-route.post('/', updateCurrentUserInfo);
-route.post('/login', login);
-route.post('/registers', register);
+route.get('/getUserInfo', authenticate, getCurrentUserInfo);
+route.put('/updateUserInfo', authenticate, updateCurrentUserValidation, updateCurrentUserInfo);
+route.post('/login', loginValidation, login);
+route.post('/register', registerValidation, register);
 
 export default route;
