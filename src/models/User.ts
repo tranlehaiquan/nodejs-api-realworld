@@ -52,6 +52,16 @@ UserSchema.methods.validatePassword = function(password: string): boolean {
   return hash === this.hash;
 }
 
+UserSchema.post('save', (error: any, doc: any, next: Function) => {
+  const [name] = Object.keys(error.keyValue);
+
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error(`${name} has been taken`));
+  } else {
+    next();
+  }
+});
+
 UserSchema.pre('save', function(this: IUser, next) {
   if(!this.image) {
     const hashEmail = crypto.createHash('md5').update(this.email).digest('hex');

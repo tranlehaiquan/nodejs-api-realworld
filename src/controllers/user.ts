@@ -25,7 +25,7 @@ const validations = {
     if(!error.isEmpty()) {
       const errorMsg = error.array().map((error) => error.msg);
       
-      res.send(new ErrorResponse(errorMsg));
+      res.json(new ErrorResponse(errorMsg));
       return;
     }
 
@@ -45,19 +45,19 @@ export async function login(req: Request, res: Response) {
 
   if(!user) {
     res.status(401);
-    res.send(new ErrorResponse('Unauthorized', 401));  
+    res.json(new ErrorResponse('Unauthorized', 401));  
   }
 
   const isRightPassword = user.validatePassword(password);
 
   if(!isRightPassword) {
     res.status(401);
-    res.send(new ErrorResponse('Unauthorized', 401));
+    res.json(new ErrorResponse('Unauthorized', 401));
   }
   
   const token = await signJWT(user.toObject());
 
-  res.send({
+  res.json({
     data: {
       ...user.toObject(),
       token,
@@ -79,7 +79,7 @@ export const registerValidation = [
     if(!error.isEmpty()) {
       const errorMsg = error.array().map((error) => error.msg);
       
-      res.send(new ErrorResponse(errorMsg));
+      res.json(new ErrorResponse(errorMsg));
       return;
     }
 
@@ -99,21 +99,14 @@ export async function register(req: Request, res: Response) {
     const user = await newUser.save();
     const token = await signJWT(user.toObject());
 
-    res.send({
+    res.json({
       data: {
         ...user.toObject(),
         token,
       },
     });
   } catch(err) {
-    if(err.code === 11000) {
-      const [name] = Object.keys(err.keyValue);
-
-      res.send(new ErrorResponse(`${name} đã được sử dụng`));
-      return;
-    }
-
-    res.send(process.env.IS_DEV ? err.message : 'Một số lỗi xãy ra vui lòng hiên hệ để biết thêm');
+    res.json(new ErrorResponse(err.message));
   }
 }
 
@@ -123,8 +116,17 @@ export async function register(req: Request, res: Response) {
  * @param res 
  */
 export async function getCurrentUserInfo(req: Request, res: Response) {
-  res.send({
-    data: omit(req.user, ['exp', 'iat']),
+  const { id } = req.user;
+
+  const user = await User.findById(id);
+  if(!user) {
+    res.status(404);
+    res.json(new ErrorResponse('Not found user', 404));
+    return;
+  }
+
+  res.json({
+    data: user.toObject(),
   });
 } 
 
@@ -145,13 +147,17 @@ export async function updateCurrentUserInfo(req: Request, res: Response) {
     return;
   }
 
-  user.email = email;
-  user.bio = bio;
-  user.image = image;
+  try {
+    if(email) user.email = email;
+    if(bio) user.bio = bio;
+    if(image) user.image = image;
 
-  await user.save();
+    await user.save();
 
-  res.json({
-    data: user.toObject(),
-  });
+    res.json({
+      data: user.toObject(),
+    });
+  } catch(err) {
+    res.json(new ErrorResponse(err.message));
+  }
 }
