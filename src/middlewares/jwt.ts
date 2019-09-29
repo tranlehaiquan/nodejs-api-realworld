@@ -18,8 +18,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     req.user = user;
     next();
   } catch (err) {
-    console.log(err);
     res.status(401);
-    res.send(new ErrorResponse('Invalid token', 401));
+    res.send(new ErrorResponse(err.message, 401));
   }
 };

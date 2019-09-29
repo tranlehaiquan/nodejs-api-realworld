@@ -1,15 +1,12 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import user from './user';
-import { authenticate } from '../../middlewares/jwt';
+import articles from './articles';
+import { validateError } from '../../middlewares/validateError';
 
 const route = Router();
 
 route.use('/user', user);
-
-route.get('/test', authenticate, (req: Request, res: Response) => {
-  console.log(req.user);
-
-  res.json(req.user);
-});
+route.use('/articles', articles);
+route.use(validateError);
 
 export default route;

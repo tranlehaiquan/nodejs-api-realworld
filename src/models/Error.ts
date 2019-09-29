@@ -1,8 +1,8 @@
 export class ErrorResponse {
-  message: string | Array<string>;
+  message: string | Array<string> | object;
   code?: number;
 
-  constructor(message: string | Array<string>, code?: number) {
+  constructor(message: string | Array<string> | object, code?: number) {
     this.code = code;
     this.message = message;
     if(Array.isArray(message) && message.length === 1) this.message = message[0];

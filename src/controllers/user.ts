@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, validationResult, sanitizeBody } from 'express-validator';
-import omit from 'lodash/omit';
 
 import { ErrorResponse } from '../models/Error';
 import User from '../models/User';
@@ -23,9 +22,10 @@ const validations = {
     const error = validationResult(req);
 
     if(!error.isEmpty()) {
-      const errorMsg = error.array().map((error) => error.msg);
-      
-      res.json(new ErrorResponse(errorMsg));
+      next({
+        name: 'validationError',
+        errors: error,
+      })
       return;
     }
 

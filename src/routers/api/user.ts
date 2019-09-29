@@ -1,6 +1,18 @@
-import { Router } from 'express';
-import { login, registerValidation ,register, getCurrentUserInfo, updateCurrentUserInfo, loginValidation, updateCurrentUserValidation } from '../../controllers/user';
-import { authenticate } from '../../middlewares/jwt';
+import {
+  Router
+} from 'express';
+import {
+  login,
+  registerValidation,
+  register,
+  getCurrentUserInfo,
+  updateCurrentUserInfo,
+  loginValidation,
+  updateCurrentUserValidation
+} from '../../controllers/user';
+import {
+  authenticate
+} from '../../middlewares/jwt';
 
 const route = Router();
 

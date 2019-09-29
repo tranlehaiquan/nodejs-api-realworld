@@ -17,14 +17,14 @@ const UserSchema = new Schema({
     required: true,
     lowercase: true,
     index: true,
-    unique: 'Email không được trùng',
+    unique: true,
   },
   username: {
     type: String,
     required: true,
     trim: true,
     index: true,
-    unique: 'Tài khoản không được trùng',
+    unique: true,
   },
   bio: { type: String, default: '' },
   image: String,
@@ -32,6 +32,15 @@ const UserSchema = new Schema({
   salt: String,
 }, {
   toObject: { transform: function(doc: IUser) {
+    return {
+      id: doc._id,
+      email: doc.email,
+      username: doc.username,
+      bio: doc.bio,
+      image: doc.image,
+    };
+  }},
+  toJSON: { transform: function(doc: IUser) {
     return {
       id: doc._id,
       email: doc.email,

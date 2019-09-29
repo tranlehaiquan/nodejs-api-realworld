@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import routers from './routers';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
@@ -20,6 +20,11 @@ app.use(morgan('dev'));
 
 // define a route handler for the default home page
 app.use('/', routers);
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.status(404);
+  res.send('Not found!');
+});
 
 // start the Express server
 app.listen( port, () => {

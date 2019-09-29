@@ -32,7 +32,11 @@ export const signJWT = async (payload: any):Promise<Token> => {
 export const verifyJWT = (token: string): string | object => {
   return new Promise((res, rej) => {
     jwt.verify(token, process.env.TOKEN_KEY, (err, decoded) => {
-      if(err) rej(err);
+      if(err) {
+        let message = err.message;
+        if(err.name === 'TokenExpiredError') message = 'Token has been expired';
+        rej(new Error(message));
+      }
       res(decoded);
     });
   });
