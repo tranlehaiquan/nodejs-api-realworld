@@ -6,6 +6,8 @@ import {
   createArticleValidation,
   getArticle,
   getArticles,
+  updateArticleValidation,
+  updateArticle,
 } from '../../controllers/article';
 import {
   authenticate
@@ -17,5 +19,6 @@ const route = Router();
 route.post('/', authenticate, createArticleValidation, createArticle);
 route.get('/', getArticles);
 route.get('/:slug', getArticle);
+route.put('/:slug', updateArticleValidation, updateArticle)
 
 export default route;

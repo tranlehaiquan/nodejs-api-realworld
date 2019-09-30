@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import crypto from 'crypto';
+import { toSlug } from '../utils/string';
 
 import { IUser } from './User';
 import { IComment } from './Comment';
@@ -20,15 +21,11 @@ const ArticleShema = new Schema({
     type: String,
     trim: true,
     lowercase: true,
-    // unique: true,
-    // index: true,
   },
   title: {
     type: String,
     trim: true,
     required: true,
-    // unique: true,
-    // index: true,
   },
   description: {
     type: String,
@@ -76,9 +73,8 @@ ArticleShema.pre('save', function(this: IArticle, next) {
     next();
     return;
   }
-  const regex = /\s/gi;
   const salt = crypto.randomBytes(16).toString('hex');
-  const slug = this.title.trim().toLocaleLowerCase().replace(regex, '_') + `_${salt}`;
+  const slug = toSlug(this.title) + `-${salt}`;
   this.slug = slug;
   next();
 });

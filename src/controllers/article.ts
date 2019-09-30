@@ -9,10 +9,12 @@ const validations = {
   title: body('title')
   .not().isEmpty().withMessage('Vui lòng điền title bài viết')
     .isLength({ min: 10 }).withMessage('Tên ít nhất 10 ký tự')
+    .isLength({ max: 60 }).withMessage('Tên nhiều nhất 60 ký tự')
     .trim().escape(),
   description: body('description')
   .not().isEmpty().withMessage('Vui lòng điền mô tả bài viết')
     .isLength({ min: 20 }).withMessage('Mô tả ít nhất 20 ký tự')
+    .isLength({ max: 100 }).withMessage('Mô tả nhiều nhất 100 ký tự')
     .trim().escape(),
   body: body('body')
   .not().isEmpty().withMessage('Vui lòng điền nội dung bài viết')
@@ -119,6 +121,37 @@ export const getArticle = async (req: Request, res: Response) => {
   });
 };
 
+export const updateArticleValidation = [
+  validations.title,
+  validations.description,
+  validations.body,
+  validations.middleWare,
+];
+
 export const updateArticle = async (req: Request, res: Response) => {
+  const { title, description, body, tagList } = req.body;
+  const { slug } = req.params;
+  const article = await Article.findOne({ slug });
   
+  if(!article) {
+    res.status(404);
+    res.json(new ErrorResponse('Can\'t find the article', 404));
+    return;
+  }
+
+  if(article.author !== req.user.id) {
+    res.json(new ErrorResponse('You don\'t have permission to update article', 404));
+    return;
+  }
+
+  if(title) article.title = title;
+  if(description) article.description = description;
+  if(body) article.body = body;
+  if(tagList) article.tagList = tagList;
+
+  await article.save();
+
+  res.json({
+    data: article,
+  });
 };
