@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
+import mongoose from 'mongoose';
 
 import { ErrorResponse } from '../models/Error';
 import Article from '../models/Article';
+import FavoriteArticle from '../models/Favorite';
 import User from '../models/User';
 
 const validations = {
@@ -66,25 +68,64 @@ export const createArticle = async (req: Request, res: Response) => {
  * Get articles
  */
 export const getArticles = async (req: Request, res: Response) => {
-  const { tag = '', author, limit = 20, offset = 0 } = req.query;
+  const { tag = '', author, limit = 20, offset = 0, favoriteBy = '' } = req.query;
   let query: {
     tagList?: string,
     author?: string,
   } = {};
-
   if(tag) query.tagList = tag.includes(',') ? { $in: tag.split(',')} : tag;
   if(author) {
     const authorObject = await User.findOne({ username: author });
     query.author = authorObject.id;
   }
-  const articles = Article.find({ ...query })
+
+  if(!favoriteBy) {
+    const articles = Article.find({ ...query })
+      .skip(offset)
+      .limit(+limit)
+      .sort({createdAt: 'desc'})
+      .populate('author')
+      .exec();
+    const articlesCount = Article.count(query).exec();
+  
+    const result = await Promise.all([articles, articlesCount]);
+    res.json({
+      data: {
+        articles: result[0].map((article) => ({
+          ...article.toObject()
+        })),
+        articlesCount: result[1],
+      }
+    });
+  }
+
+  // if query have favorite by, get list of article
+  // by query collection favoriteArticles
+  const userFavorite = await User.findOne({ username: favoriteBy });
+  
+  // if user not found
+  if(!userFavorite) {
+    res.json({
+      data: {
+        articles: [],
+        articlesCount: 0,
+      }
+    });
+    return;
+  }
+
+  const articles = FavoriteArticle.find({ user: userFavorite.id })
     .skip(offset)
     .limit(+limit)
-    .sort({createdAt: 'desc'})
-    .populate('author')
+    .sort({createdAt: 'desc'})  
+    .populate({
+      path: 'article',
+      populate: {
+        path: 'author',
+      }
+    })
     .exec();
-  const articlesCount = Article.count(query).exec();
-
+  const articlesCount = FavoriteArticle.count({ user: userFavorite.id }).exec();
   const result = await Promise.all([articles, articlesCount]);
 
   res.json({
@@ -101,43 +142,31 @@ export const getArticles = async (req: Request, res: Response) => {
  * /articles/:slug
  */
 export const getArticle = async (req: Request, res: Response) => {
-  const { slug } = req.params;
-  
-  if(!slug) {
-    res.status(404);
-    res.json(new ErrorResponse('Can\'t find the article', 404));
-    return;
+  const { article, user } = req;
+  const numberOfFavorite = await FavoriteArticle.count({ article: article.id });
+  let favorited = false;
+  if(user) {
+    const result = await FavoriteArticle.findOne({ article: article.id, user: user.id });
+    if(result) favorited = true;
   }
-
-  const article = await Article.findOne({ slug });
-  if(!article) {
-    res.status(404);
-    res.json(new ErrorResponse('Can\'t find the article', 404));
-    return;
-  } 
 
   res.json({
     data: article.toObject(),
+    favoritesCount: numberOfFavorite,
+    favorited,
   });
 };
 
 export const updateArticleValidation = [
   validations.title,
   validations.description,
-  validations.body,
+  validations.body, 
   validations.middleWare,
 ];
 
 export const updateArticle = async (req: Request, res: Response) => {
   const { title, description, body, tagList } = req.body;
-  const { slug } = req.params;
-  const article = await Article.findOne({ slug });
-  
-  if(!article) {
-    res.status(404);
-    res.json(new ErrorResponse('Can\'t find the article', 404));
-    return;
-  }
+  const article = req.article;
 
   if(article.author !== req.user.id) {
     res.json(new ErrorResponse('You don\'t have permission to update article', 404));
@@ -155,3 +184,37 @@ export const updateArticle = async (req: Request, res: Response) => {
     data: article,
   });
 };
+
+export const favoriteArticle = async (req: Request, res: Response, next: NextFunction) => {
+  const { article, user } = req;
+
+  const favoriteArticle = await FavoriteArticle.findOne({ user: user.id, article: article.id });
+  if(!favoriteArticle) {
+    const userFavorite = new FavoriteArticle({ user: user.id, article: article.id });
+    await userFavorite.save();
+  }
+  res.send({
+    data: true,
+  });
+}
+
+export const unFavoriteArticle = async (req: Request, res: Response, next: NextFunction) => {
+  const { article, user } = req;
+
+  await FavoriteArticle.deleteOne({ user: mongoose.Types.ObjectId(user.id), article: article.id });
+  res.send({
+    data: true,
+  });
+}
+
+export const slugTrigger = async (req: Request, res: Response, next: NextFunction, slug:string) => {
+  const article = await Article.findOne({ slug });
+  if(!article) {
+    res.status(404);
+    res.json(new ErrorResponse('Can\'t find the article', 404));
+    return;
+  } else {
+    req.article = article;
+    next();
+  }
+}

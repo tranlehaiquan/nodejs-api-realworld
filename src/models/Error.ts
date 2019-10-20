@@ -1,6 +1,7 @@
 export class ErrorResponse {
   message: string | Array<string> | object;
   code?: number;
+  status?: number;
 
   constructor(message: string | Array<string> | object, code?: number) {
     this.code = code;

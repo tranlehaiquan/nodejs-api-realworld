@@ -11,14 +11,14 @@ import {
   updateCurrentUserValidation
 } from '../../controllers/user';
 import {
-  authenticate
+  AuthRequired,
 } from '../../middlewares/jwt';
 
 const route = Router();
 
 // api/user/
-route.get('/getUserInfo', authenticate, getCurrentUserInfo);
-route.put('/updateUserInfo', authenticate, updateCurrentUserValidation, updateCurrentUserInfo);
+route.get('/getUserInfo', AuthRequired, getCurrentUserInfo);
+route.put('/updateUserInfo', AuthRequired, updateCurrentUserValidation, updateCurrentUserInfo);
 route.post('/login', loginValidation, login);
 route.post('/register', registerValidation, register);
 

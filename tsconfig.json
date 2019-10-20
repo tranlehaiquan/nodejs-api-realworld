@@ -15,7 +15,8 @@
       },
       "typeRoots": [
         "./types"
-      ]
+      ],
+      "resolveJsonModule": true
   },
   "include": [
       "src/**/*"

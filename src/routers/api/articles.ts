@@ -8,17 +8,36 @@ import {
   getArticles,
   updateArticleValidation,
   updateArticle,
+  slugTrigger,
+  favoriteArticle,
+  unFavoriteArticle,
 } from '../../controllers/article';
 import {
-  authenticate
+  AuthRequired,
+  AuthOptional,
 } from '../../middlewares/jwt';
 
 const route = Router();
 
-// api/user/
-route.post('/', authenticate, createArticleValidation, createArticle);
-route.get('/', getArticles);
-route.get('/:slug', getArticle);
-route.put('/:slug', updateArticleValidation, updateArticle)
+// api/articles/
+
+// create article
+route.post('/', AuthRequired, createArticleValidation, createArticle);
+// get article
+route.get('/',AuthOptional , getArticles);
+
+route.param('slug', slugTrigger);
+
+// get specific article by slug
+route.get('/:slug', AuthOptional, getArticle);
+
+// update specific article by slug
+route.put('/:slug', AuthRequired, updateArticleValidation, updateArticle);
+
+// favorite article
+route.post('/:slug/favorite', AuthRequired, favoriteArticle);
+
+// unfavorite article
+route.post('/:slug/unfavorite', AuthRequired, unFavoriteArticle);
 
 export default route;
