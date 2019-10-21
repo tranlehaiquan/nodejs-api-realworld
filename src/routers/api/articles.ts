@@ -11,6 +11,9 @@ import {
   slugTrigger,
   favoriteArticle,
   unFavoriteArticle,
+  getCommentsByOfArticle,
+  addComment,
+  deleteComment,
 } from '../../controllers/article';
 import {
   AuthRequired,
@@ -39,5 +42,8 @@ route.post('/:slug/favorite', AuthRequired, favoriteArticle);
 
 // unfavorite article
 route.post('/:slug/unfavorite', AuthRequired, unFavoriteArticle);
+route.get('/:slug/comments', AuthOptional, getCommentsByOfArticle);
+route.post('/:slug/comments', AuthRequired, addComment);
+route.delete('/comments/:id', AuthRequired, deleteComment);
 
 export default route;

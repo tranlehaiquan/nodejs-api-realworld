@@ -8,7 +8,10 @@ export interface IUser extends Document {
   image?: string,
   setPassword: (password: string) => void,
   validatePassword: (password: string) => boolean,
-  listFollow: Document['_id'][],
+  listFollow: {
+    username: String,
+    id: Document['_id']
+  }[],
 };
 
 const UserSchema = new Schema({
@@ -31,7 +34,10 @@ const UserSchema = new Schema({
   image: String,
   hash: String,
   salt: String,
-  listFollow: {type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: []},
+  listFollow: {
+    type: Array, 
+    default: []
+  },
 }, {
   toObject: { transform: function(doc: IUser) {
     return {

@@ -6,6 +6,7 @@ import { ErrorResponse } from '../models/Error';
 import Article from '../models/Article';
 import FavoriteArticle from '../models/Favorite';
 import User from '../models/User';
+import Comment from '../models/Comment';
 
 const validations = {
   title: body('title')
@@ -218,3 +219,55 @@ export const slugTrigger = async (req: Request, res: Response, next: NextFunctio
     next();
   }
 }
+
+export const addComment = async (req: Request, res: Response, next: NextFunction) => {
+  const { article, user } = req;
+  const { body } = req.body;
+  const newComment = new Comment({
+    comment: body,
+    article_id: article.id,
+    username: user.username,
+  });
+
+  try {
+    await newComment.save();
+
+    res.json({
+      data: newComment.toObject(), 
+    });
+  } catch(err) {
+    console.error(err);
+    res.json({
+      data: false, 
+    });
+  }
+};
+
+export const getCommentsByOfArticle = async (req: Request, res: Response, next: NextFunction) => {
+  const { article } = req;
+  const { limit = 20, offset = 0 } = req.query;
+  const comments = Comment
+    .find({ article_id: article.id })
+    .skip(offset)
+    .limit(+limit)
+    .sort({createdAt: 'desc'});
+  const commentCount = Comment.count({ article_id: article.id }).exec();
+
+  const result = await Promise.all([ comments, commentCount ])
+
+  res.json({
+    data: {
+      comments: result[0].map((comment) => comment.toObject()),
+      commentsCount: result[1],
+    },
+  });
+};
+
+export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
+  await Comment.deleteOne({ _id: id });
+  res.json({
+    data: true,
+  });
+};
