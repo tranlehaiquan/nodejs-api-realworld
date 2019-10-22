@@ -69,6 +69,14 @@ UserSchema.methods.validatePassword = function(password: string): boolean {
   return hash === this.hash;
 }
 
+UserSchema.pre('save', function(this: IUser, next) {
+  if(!this.image) {
+    const hashEmail = crypto.createHash('md5').update(this.email).digest('hex');
+    this.image = `https://gravatar.com/avatar/${hashEmail}?s=200`;
+  }
+  next();
+});
+
 UserSchema.post('save', (error: any, doc: any, next: Function) => {
   const [name] = Object.keys(error.keyValue);
 
@@ -79,13 +87,6 @@ UserSchema.post('save', (error: any, doc: any, next: Function) => {
   }
 });
 
-UserSchema.pre('save', function(this: IUser, next) {
-  if(!this.image) {
-    const hashEmail = crypto.createHash('md5').update(this.email).digest('hex');
-    this.image = `https://gravatar.com/avatar/${hashEmail}?s=200`;
-  }
-  next();
-});
 
 /**
  * Use <User> to know to that return an User

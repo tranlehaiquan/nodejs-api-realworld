@@ -16,9 +16,9 @@ import {
 
 const route = Router();
 
-// api/user/
-route.get('/getUserInfo', AuthRequired, getCurrentUserInfo);
-route.put('/updateUserInfo', AuthRequired, updateCurrentUserValidation, updateCurrentUserInfo);
+// api/auth/
+route.get('/', AuthRequired, getCurrentUserInfo);
+route.put('/', AuthRequired, updateCurrentUserValidation, updateCurrentUserInfo);
 route.post('/login', loginValidation, login);
 route.post('/register', registerValidation, register);
 

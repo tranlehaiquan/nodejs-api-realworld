@@ -7,10 +7,10 @@ import { validateError } from '../../middlewares/validateError';
 
 const route = Router();
 
-route.use('/user', user);
+route.use('/auth', user);
 route.use('/articles', articles);
 route.use('/tags', tags);
-route.use('/profile', profile);
+route.use('/profiles', profile);
 route.use(validateError);
 
 export default route;

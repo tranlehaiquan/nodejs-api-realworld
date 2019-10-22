@@ -41,7 +41,7 @@ route.put('/:slug', AuthRequired, updateArticleValidation, updateArticle);
 route.post('/:slug/favorite', AuthRequired, favoriteArticle);
 
 // unfavorite article
-route.post('/:slug/unfavorite', AuthRequired, unFavoriteArticle);
+route.delete('/:slug/favorite', AuthRequired, unFavoriteArticle);
 route.get('/:slug/comments', AuthOptional, getCommentsByOfArticle);
 route.post('/:slug/comments', AuthRequired, addComment);
 route.delete('/comments/:id', AuthRequired, deleteComment);

@@ -33,7 +33,8 @@
     "preserver": "npm run build",
     "server": "node ./dist/index.js",
     "dev": "nodemon ./src/index.ts",
-    "dev:debug": "nodemon --inspect ./src/index.ts"
+    "dev:debug": "nodemon --inspect ./src/index.ts",
+    "start": "npm run build && npm run server"
   },
   "repository": {
     "type": "git",
