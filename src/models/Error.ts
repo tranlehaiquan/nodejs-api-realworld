@@ -1,11 +1,24 @@
-export class ErrorResponse {
-  message: string | Array<string> | object;
-  code?: number;
-  status?: number;
+export class ErrorResponse extends Error {
+  public statusCode: number;
+  public error: string;
 
-  constructor(message: string | Array<string> | object, code?: number) {
-    this.code = code;
-    this.message = message;
-    if(Array.isArray(message) && message.length === 1) this.message = message[0];
+  constructor(statusCode: number, message: string) {
+    // easy to trace stack error
+    super(message);
+
+    this.statusCode = statusCode;
+    this.error = message;
+  }
+};
+
+export class ErrorValidation extends Error {
+  public errors: object;
+  public statusCode: number;
+
+  constructor(errors: object, statusCode: number = 400, ...paras: any) {
+    super(paras);
+    
+    this.statusCode = statusCode;
+    this.errors = errors;
   }
 }

@@ -23,7 +23,7 @@ const validations = {
   .not().isEmpty().withMessage('Vui lòng điền nội dung bài viết')
     .isLength({ min: 50 }).withMessage('Nội dung bài ít nhất 50 ký tự')
     .trim(),
-  middleWare: async (req: Request, res: Response, next: NextFunction) => {
+  middleWare: async (req: Request, res: Response, next: NextFunction) => {  
     const error = validationResult(req);
 
     if(!error.isEmpty()) {
@@ -165,12 +165,12 @@ export const updateArticleValidation = [
   validations.middleWare,
 ];
 
-export const updateArticle = async (req: Request, res: Response) => {
+export const updateArticle = async (req: Request, res: Response, next: NextFunction) => {
   const { title, description, body, tagList } = req.body;
   const article = req.article;
 
   if(article.author !== req.user.id) {
-    res.json(new ErrorResponse('You don\'t have permission to update article', 404));
+    next(new ErrorResponse(404, 'You don\'t have permission to update article'));
     return;
   }
 
@@ -212,7 +212,7 @@ export const slugTrigger = async (req: Request, res: Response, next: NextFunctio
   const article = await Article.findOne({ slug });
   if(!article) {
     res.status(404);
-    res.json(new ErrorResponse('Can\'t find the article', 404));
+    res.json(new ErrorResponse(404, 'Can\'t find the article'));
     return;
   } else {
     req.article = article;

@@ -19,12 +19,12 @@ const validations = {
   bio: body('bio').trim().escape(),
   image: body('image').trim().isURL(),
   middleWare: async (req: Request, res: Response, next: NextFunction) => {
-    const error = validationResult(req);
+    const errors = validationResult(req);
 
-    if(!error.isEmpty()) {
+    if(!errors.isEmpty()) {
       next({
         name: 'validationError',
-        errors: error,
+        errors,
       })
       return;
     }
@@ -39,20 +39,20 @@ export const loginValidation = [
   validations.middleWare,
 ];
 
-export async function login(req: Request, res: Response) {
+export async function login(req: Request, res: Response, next: NextFunction) {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
 
   if(!user) {
-    res.status(401);
-    res.json(new ErrorResponse('Unauthorized', 401));  
+    next(new ErrorResponse(401, 'Username or password is incorrect!'));
+    return;
   }
 
   const isRightPassword = user.validatePassword(password);
 
   if(!isRightPassword) {
-    res.status(401);
-    res.json(new ErrorResponse('Unauthorized', 401));
+    next(new ErrorResponse(401, 'Username or password is incorrect!'));
+    return;
   }
   
   const token = await signJWT(user.toObject());
@@ -73,21 +73,10 @@ export const registerValidation = [
     gmail_remove_dots: false,
     gmail_remove_subaddress: false
   }),
-  async (req: Request, res: Response, next: NextFunction) => {
-    const error = validationResult(req);
-
-    if(!error.isEmpty()) {
-      const errorMsg = error.array().map((error) => error.msg);
-      
-      res.json(new ErrorResponse(errorMsg));
-      return;
-    }
-
-    next();
-  }
+  validations.middleWare,
 ];
 
-export async function register(req: Request, res: Response) {
+export async function register(req: Request, res: Response, next: NextFunction) {
   const { username, email, password } = req.body;
   const newUser = new User({
     email,
@@ -106,7 +95,7 @@ export async function register(req: Request, res: Response) {
       },
     });
   } catch(err) {
-    res.json(new ErrorResponse(err.message));
+    next(new ErrorResponse(400, err.message));
   }
 }
 
@@ -121,7 +110,7 @@ export async function getCurrentUserInfo(req: Request, res: Response) {
   const user = await User.findById(id);
   if(!user) {
     res.status(404);
-    res.json(new ErrorResponse('Not found user', 404));
+    res.json(new ErrorResponse(404, 'Not found user'));
     return;
   }
 
@@ -136,14 +125,13 @@ export const updateCurrentUserValidation = [
   validations.middleWare,
 ];
 
-export async function updateCurrentUserInfo(req: Request, res: Response) {
+export async function updateCurrentUserInfo(req: Request, res: Response, next: NextFunction) {
   const { email, bio, image } = req.body;
   const { id } = req.user;
 
   const user = await User.findById(id);
   if(!user) {
-    res.status(404);
-    res.json(new ErrorResponse('Not found user', 404));
+    next(new ErrorResponse(404, 'Not found user'));
     return;
   }
 
@@ -158,6 +146,6 @@ export async function updateCurrentUserInfo(req: Request, res: Response) {
       data: user.toObject(),
     });
   } catch(err) {
-    res.json(new ErrorResponse(err.message));
+    next(new ErrorResponse(400, err.message));
   }
 }
