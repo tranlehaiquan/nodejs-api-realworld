@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, validationResult, sanitizeBody } from 'express-validator';
 
-import { ErrorResponse } from '../models/Error';
+import { ErrorsValidationResponse, ErrorResponse } from '../models/Error';
 import User from '../models/User';
 import { signJWT } from '../utils/jwt';
 
@@ -22,10 +22,7 @@ const validations = {
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
-      next({
-        name: 'validationError',
-        errors,
-      })
+      next(new ErrorsValidationResponse(errors, 400));
       return;
     }
 
@@ -104,13 +101,12 @@ export async function register(req: Request, res: Response, next: NextFunction) 
  * @param req
  * @param res 
  */
-export async function getCurrentUserInfo(req: Request, res: Response) {
+export async function getCurrentUserInfo(req: Request, res: Response, next: NextFunction) {
   const { id } = req.user;
 
   const user = await User.findById(id);
   if(!user) {
-    res.status(404);
-    res.json(new ErrorResponse(404, 'Not found user'));
+    next(new ErrorResponse(404, 'Not found user'));
     return;
   }
 

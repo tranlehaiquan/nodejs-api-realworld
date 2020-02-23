@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import { ErrorResponse } from '../models/Error';
+import { ErrorResponse, ErrorsValidationResponse } from '../models/Error';
 import Article from '../models/Article';
 import FavoriteArticle from '../models/Favorite';
 import User from '../models/User';
@@ -24,13 +24,10 @@ const validations = {
     .isLength({ min: 50 }).withMessage('Nội dung bài ít nhất 50 ký tự')
     .trim(),
   middleWare: async (req: Request, res: Response, next: NextFunction) => {  
-    const error = validationResult(req);
+    const errors = validationResult(req);
 
-    if(!error.isEmpty()) {
-      next({
-        name: 'validationError',
-        errors: error,
-      });
+    if(!errors.isEmpty()) {
+      next(new ErrorsValidationResponse(errors));
       return;
     }
 
@@ -211,8 +208,7 @@ export const unFavoriteArticle = async (req: Request, res: Response, next: NextF
 export const slugTrigger = async (req: Request, res: Response, next: NextFunction, slug:string) => {
   const article = await Article.findOne({ slug });
   if(!article) {
-    res.status(404);
-    res.json(new ErrorResponse(404, 'Can\'t find the article'));
+    next(new ErrorResponse(404, 'Can\'t find the article'));
     return;
   } else {
     req.article = article;

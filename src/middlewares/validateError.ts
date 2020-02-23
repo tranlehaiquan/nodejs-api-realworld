@@ -1,39 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
-import { Result } from 'express-validator';
-import { ErrorValidation, ErrorResponse } from '../models/Error';
-
-interface IError {
-  name: string,
-  errors?: Result,
-  statusCode: number,
-};
+import { ErrorsValidationResponse, ErrorResponse } from '../models/Error';
 
 /**
- * This middleware only handle validation error, statusCode is 400
+ * This middleware just use to catch error ErrorsValidationResponse
  * @param error 
  * @param req 
  * @param res 
  * @param next 
  */
-export const validateError = (error: IError , req: Request, res: Response, next: NextFunction) => {
-  if(error.name === 'validationError') {
-    const errorObject:any = {};
-    error.errors.array().forEach(({ msg, param }) => errorObject[param] = msg);
-    
-    res.status(400).json(new ErrorValidation(errorObject));
+export const middlewareExpressValidation = (errors: ErrorsValidationResponse | any , req: Request, res: Response, next: NextFunction) => {
+  if(errors instanceof ErrorsValidationResponse) {
+    // do what ever this error need
+    const { statusCode } = errors;
+
+    res.status(statusCode).json(errors);
   }
 
-  next(error);
+  next(errors);
 };
 
 /**
- * Base handler error
+ * This middleware just use to catch error ErrorsValidationResponse
  * @param error 
  * @param req 
  * @param res 
  * @param next 
  */
-export const handlerError = (error: ErrorResponse, req: Request, res: Response, next: NextFunction) => {
+export const middlewareHandlerError = (error: ErrorResponse | any, req: Request, res: Response, next: NextFunction) => {
+  // this is base handler error
+  // every error don't have specific handler
+  // will go to this
   const { statusCode } = error;
 
   res.status(statusCode).json(error);
