@@ -68,7 +68,8 @@ https://hackernoon.com/restful-api-designing-guidelines-the-best-practices-60e1d
 
 ## Todos
 
-- Support swagger docs
-- Support multiple language
-- Better error handler
-- Integrate with front end
+[ ] JWT problems
+[x] Better error handler
+[ ] Support swagger docs
+[ ] Support multiple language
+[ ] Integrate with front end

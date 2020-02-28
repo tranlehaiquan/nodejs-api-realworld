@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import addMilliseconds from 'date-fns/addMilliseconds';
+
+import { ErrorResponse } from '../models/Error';
 import { milisecondOfDay } from './date';
 
 const secondsOfDay = milisecondOfDay / 1000;
@@ -23,7 +25,7 @@ export const signJWT = async (payload: any):Promise<Token> => {
       if(err) rej(err);
       res({
         token,
-        exp: Math.floor(addMilliseconds(new Date(), milisecondOfDay).getTime() / 1000),
+        exp: addMilliseconds(new Date(), milisecondOfDay).getTime(),
       });
     });
   });
@@ -35,7 +37,7 @@ export const verifyJWT = (token: string): string | object => {
       if(err) {
         let message = err.message;
         if(err.name === 'TokenExpiredError') message = 'Token has been expired';
-        rej(new Error(message));
+        rej(new ErrorResponse(401, message));
       }
       res(decoded);
     });

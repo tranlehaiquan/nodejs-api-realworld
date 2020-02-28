@@ -5,7 +5,6 @@ import morgan from 'morgan';
 import database from './database';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJSDoc from 'swagger-jsdoc';
 
 import { ErrorResponse } from './models/Error';
 import * as swaggerDocument from '../swagger.json';

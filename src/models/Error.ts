@@ -13,12 +13,13 @@ export class ErrorResponse extends Error {
   }
 };
 
+type ErrorsObject = { [key: string]: string; };
 /**
  * This ErrosValidationResponse class use to
  * return errors for express validator
  */
 export class ErrorsValidationResponse extends Error {
-  public errors: { [key: string]: string; };
+  public errors: ErrorsObject;
   public statusCode: number;
 
   constructor(errors: Result | Object, statusCode: number = 400, ...params: any) {
@@ -35,8 +36,8 @@ export class ErrorsValidationResponse extends Error {
     this.statusCode = statusCode;
   }
 
-  public static convertResultToErrorsObject(errors: Result): { [key: string]: string; } {
-    const errorsObject : { [key: string]: string; } = {};
+  public static convertResultToErrorsObject(errors: Result): ErrorsObject {
+    const errorsObject : ErrorsObject = {};
     errors.array().forEach(({ msg, param } : { msg: string, param: string }) => errorsObject[param] = msg);
 
     return errorsObject;

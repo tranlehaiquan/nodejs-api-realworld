@@ -12,7 +12,7 @@ export const AuthOptional = async (req: Request, res: Response, next: NextFuncti
   const { authorization } = req.headers;
 
   try {
-    const user = await verifyJWT(authorization + '');
+    const user = await verifyJWT(authorization);
     req.user = user;
   } catch (err) {
     console.log(err);
@@ -25,19 +25,16 @@ export const AuthRequired = async (req: Request, res: Response, next: NextFuncti
   const { authorization } = req.headers;
 
   if(!authorization) {
-    res.status(401);
-    res.send(new ErrorResponse(401, 'Unauthorized'));
-
+    next(new ErrorResponse(401, 'Please login to access'));
     return;
   }
 
   try {
-    const user = await verifyJWT(authorization + '');
+    const user = await verifyJWT(authorization);
     req.user = user;
     next();
   } catch (err) {
-    res.status(401);
-    res.send(new ErrorResponse(401, err.message));
+    next(err);
   }
 }
 
