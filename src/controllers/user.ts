@@ -17,7 +17,7 @@ const validations = {
     .not().isEmpty().withMessage('Vui lòng điền mật khẩu')
     .isLength({ min: 5 }).withMessage('Mật khẩu phải ít nhất 5 ký tự'),
   bio: body('bio').trim().escape(),
-  image: body('image').trim().isURL(),
+  image: body('image').trim().not().isEmpty().optional({ checkFalsy: true }).isURL(),
   middleWare: async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
 
@@ -116,13 +116,13 @@ export async function getCurrentUserInfo(req: Request, res: Response, next: Next
 } 
 
 export const updateCurrentUserValidation = [
-  validations.email,
   validations.bio,
+  validations.image,
   validations.middleWare,
 ];
 
 export async function updateCurrentUserInfo(req: Request, res: Response, next: NextFunction) {
-  const { email, bio, image } = req.body;
+  const { bio, image } = req.body;
   const { id } = req.user;
 
   const user = await User.findById(id);
@@ -132,7 +132,6 @@ export async function updateCurrentUserInfo(req: Request, res: Response, next: N
   }
 
   try {
-    if(email) user.email = email;
     if(bio) user.bio = bio;
     if(image) user.image = image;
 

@@ -25,12 +25,17 @@ export const AuthRequired = async (req: Request, res: Response, next: NextFuncti
   const { authorization } = req.headers;
 
   if(!authorization) {
-    next(new ErrorResponse(401, 'Please login to access'));
+    next(new ErrorResponse(401, 'This route need token to be access'));
+    return;
+  }
+
+  if(!authorization.startsWith('Bearer')) {
+    next(new ErrorResponse(401, 'Invaild access token'));
     return;
   }
 
   try {
-    const user = await verifyJWT(authorization);
+    const user = await verifyJWT(authorization.split(' ')[1]);
     req.user = user;
     next();
   } catch (err) {

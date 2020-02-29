@@ -14,6 +14,7 @@ export const middlewareExpressValidation = (errors: ErrorsValidationResponse | a
     const { statusCode } = errors;
 
     res.status(statusCode).json(errors);
+    return;
   }
 
   next(errors);

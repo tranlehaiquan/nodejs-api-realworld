@@ -95,6 +95,7 @@ export const getArticles = async (req: Request, res: Response) => {
         articlesCount: result[1],
       }
     });
+    return;
   }
 
   // if query have favorite by, get list of article
