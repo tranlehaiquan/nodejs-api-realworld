@@ -39,8 +39,7 @@ export const paramProfile = async (req: Request, res: Response, next: NextFuncti
   const profile = await User.findOne({ username: value });
 
   if(!profile) {
-    res.status(404);
-    res.json(new ErrorResponse('Can\'t find the article', 404));
+    next(new ErrorResponse(404, 'Can\'t find the article'));
     return;
   } else {
     req.profile = profile;
@@ -57,8 +56,7 @@ export const followProfile = async (req: Request, res: Response, next: NextFunct
   const profileIsIncluded = indexOfProfile >= 0;
 
   if(!user) {
-    res.status(404);
-    res.json(new ErrorResponse('Can\'t find the user', 404));
+    next(new ErrorResponse(404, 'Can\'t find the user'));
     return;
   }
 
@@ -82,8 +80,7 @@ export const unFollowProfile = async (req: Request, res: Response, next: NextFun
   const profileIsIncluded = indexOfProfile >= 0;
 
   if(!user) {
-    res.status(404);
-    res.json(new ErrorResponse('Can\'t find the user', 404));
+    next(new ErrorResponse(404, 'Can\'t find the user'));
     return;
   }
 

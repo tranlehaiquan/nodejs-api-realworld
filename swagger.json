@@ -3,18 +3,18 @@
   "info": {
     "description": "Realworld api",
     "version": "1.0.0",
-    "title": "Swagger Realworld",
+    "title": "Pet project Realworld",
     "termsOfService": "http://swagger.io/terms/",
     "contact": {
-      "email": "apiteam@swagger.io"
+      "email": "tranlehaiquan@gmail.com"
     },
     "license": {
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "host": "localhost:3000/api",
-  "basePath": "/v2",
+  "host": "localhost:3000",
+  "basePath": "/api",
   "tags": [
     {
       "name": "pet",
@@ -53,7 +53,7 @@
             "description": "Pet object that needs to be added to the store",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Pet"
+              "$ref": "#/definitions/Article"
             }
           }
         ],
@@ -93,7 +93,7 @@
             "description": "Pet object that needs to be added to the store",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Pet"
+              "$ref": "#/definitions/User"
             }
           }
         ],
@@ -136,56 +136,45 @@
     }
   },
   "definitions": {
-    "Order": {
+    "Article": {
       "type": "object",
       "properties": {
         "id": {
           "type": "integer",
           "format": "int64"
         },
-        "petId": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "quantity": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "shipDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "status": {
-          "type": "string",
-          "description": "Order Status",
-          "enum": [
-            "placed",
-            "approved",
-            "delivered"
-          ]
-        },
-        "complete": {
-          "type": "boolean",
-          "default": false
-        }
-      },
-      "xml": {
-        "name": "Order"
-      }
-    },
-    "Category": {
-      "type": "object",
-      "properties": {
-        "id": {
+        "slug": {
           "type": "integer",
           "format": "int64"
         },
         "name": {
           "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "favoritesCount": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "author": {
+          "type": "string"
         }
       },
       "xml": {
-        "name": "Category"
+        "name": "Article"
       }
     },
     "User": {
@@ -198,111 +187,48 @@
         "username": {
           "type": "string"
         },
-        "firstName": {
-          "type": "string"
-        },
-        "lastName": {
-          "type": "string"
-        },
         "email": {
           "type": "string"
         },
-        "password": {
+        "bio": {
           "type": "string"
         },
-        "phone": {
+        "image": {
           "type": "string"
-        },
-        "userStatus": {
-          "type": "integer",
-          "format": "int32",
-          "description": "User Status"
         }
       },
       "xml": {
         "name": "User"
       }
     },
-    "Tag": {
+    "Errors": {
       "type": "object",
       "properties": {
-        "id": {
+        "statusCode": {
           "type": "integer",
           "format": "int64"
         },
-        "name": {
+        "errors": {
           "type": "string"
         }
       },
       "xml": {
-        "name": "Tag"
+        "name": "Errors"
       }
     },
-    "Pet": {
+    "Error": {
       "type": "object",
-      "required": [
-        "name",
-        "photoUrls"
-      ],
       "properties": {
-        "id": {
+        "statusCode": {
           "type": "integer",
           "format": "int64"
         },
-        "category": {
-          "$ref": "#/definitions/Category"
-        },
-        "name": {
-          "type": "string",
-          "example": "doggie"
-        },
-        "photoUrls": {
-          "type": "array",
-          "xml": {
-            "name": "photoUrl",
-            "wrapped": true
-          },
-          "items": {
-            "type": "string"
-          }
-        },
-        "tags": {
-          "type": "array",
-          "xml": {
-            "name": "tag",
-            "wrapped": true
-          },
-          "items": {
-            "$ref": "#/definitions/Tag"
-          }
-        },
-        "status": {
-          "type": "string",
-          "description": "pet status in the store",
-          "enum": [
-            "available",
-            "pending",
-            "sold"
-          ]
+        "error": {
+          "type": "string"
         }
       },
       "xml": {
-        "name": "Pet"
-      }
-    },
-    "ApiResponse": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "type": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        }
+        "name": "Error"
       }
     }
   },

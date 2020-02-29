@@ -64,3 +64,12 @@ The reason I import `username` inside `followList` because when query get follow
 ## Rest API design
 
 https://hackernoon.com/restful-api-designing-guidelines-the-best-practices-60e1d954e7c9
+
+
+## Todos
+
+[ ] JWT problems
+[x] Better error handler
+[ ] Support swagger docs
+[ ] Support multiple language
+[ ] Integrate with front end

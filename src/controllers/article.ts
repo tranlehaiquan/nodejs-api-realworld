@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import { ErrorResponse } from '../models/Error';
+import { ErrorResponse, ErrorsValidationResponse } from '../models/Error';
 import Article from '../models/Article';
 import FavoriteArticle from '../models/Favorite';
 import User from '../models/User';
@@ -23,14 +23,11 @@ const validations = {
   .not().isEmpty().withMessage('Vui lòng điền nội dung bài viết')
     .isLength({ min: 50 }).withMessage('Nội dung bài ít nhất 50 ký tự')
     .trim(),
-  middleWare: async (req: Request, res: Response, next: NextFunction) => {
-    const error = validationResult(req);
+  middleWare: async (req: Request, res: Response, next: NextFunction) => {  
+    const errors = validationResult(req);
 
-    if(!error.isEmpty()) {
-      next({
-        name: 'validationError',
-        errors: error,
-      });
+    if(!errors.isEmpty()) {
+      next(new ErrorsValidationResponse(errors));
       return;
     }
 
@@ -98,6 +95,7 @@ export const getArticles = async (req: Request, res: Response) => {
         articlesCount: result[1],
       }
     });
+    return;
   }
 
   // if query have favorite by, get list of article
@@ -165,12 +163,12 @@ export const updateArticleValidation = [
   validations.middleWare,
 ];
 
-export const updateArticle = async (req: Request, res: Response) => {
+export const updateArticle = async (req: Request, res: Response, next: NextFunction) => {
   const { title, description, body, tagList } = req.body;
   const article = req.article;
 
   if(article.author !== req.user.id) {
-    res.json(new ErrorResponse('You don\'t have permission to update article', 404));
+    next(new ErrorResponse(404, 'You don\'t have permission to update article'));
     return;
   }
 
@@ -211,8 +209,7 @@ export const unFavoriteArticle = async (req: Request, res: Response, next: NextF
 export const slugTrigger = async (req: Request, res: Response, next: NextFunction, slug:string) => {
   const article = await Article.findOne({ slug });
   if(!article) {
-    res.status(404);
-    res.json(new ErrorResponse('Can\'t find the article', 404));
+    next(new ErrorResponse(404, 'Can\'t find the article'));
     return;
   } else {
     req.article = article;
