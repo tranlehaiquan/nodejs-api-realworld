@@ -1,19 +1,15 @@
 import express, { Request, Response, NextFunction } from 'express';
 import routers from './routers';
-import dotenv from 'dotenv';
 import morgan from 'morgan';
 import database from './database';
-import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 
 import { ErrorResponse } from './models/Error';
-import * as swaggerDocument from '../swagger.json';
-
-const isProduction = process.env.NODE_ENV === 'production';
-const port = process.env.PORT || '3000';
+import * as swaggerDocument from './swagger.json';
 
 // Load .env config
-dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+const isProduction = process.env.NODE_ENV === 'production';
+const port = process.env.PORT || '3000';
 database();
 
 const app = express();

@@ -34,9 +34,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "preserver": "npm run build",
-    "server": "node ./dist/src/index.js",
-    "dev": "nodemon ./src/index.ts",
+    "preserve": "npm run build",
+    "serve": "node -r dotenv/config ./dist/src/index.js",
+    "dev": "nodemon -- -r dotenv/config ./src/index.ts",
     "dev:debug": "nodemon --inspect ./src/index.ts",
     "start": "npm run build && npm run server"
   },
