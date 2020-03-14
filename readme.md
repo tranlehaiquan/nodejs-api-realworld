@@ -7,8 +7,10 @@ API: application programming interface
 Basic mongodb schema: http://learnmongodbthehardway.com/schema/schemabasics
 
 ## One to one
+
 ## One to many
 http://learnmongodbthehardway.com/schema/schemabasics/#one-to-many-1-n
+
 ## Many to many
 
 ## Database design
@@ -73,3 +75,8 @@ https://hackernoon.com/restful-api-designing-guidelines-the-best-practices-60e1d
 [ ] Support swagger docs
 [ ] Support multiple language
 [ ] Integrate with front end
+
+## Test
+
+- Database for test: Mongodb memory server
+- Test runner: Jest, Supertest

@@ -3,10 +3,12 @@ import routers from './routers';
 import morgan from 'morgan';
 import database from './database';
 import swaggerUi from 'swagger-ui-express';
+import dotenv from 'dotenv';
 
 import { ErrorResponse } from './models/Error';
 import * as swaggerDocument from './swagger.json';
 
+dotenv.config();
 // Load .env config
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || '3000';
@@ -49,7 +51,11 @@ app.use(function(error: ErrorResponse, req: Request, res: Response, next: NextFu
   });
 });
 
-// start the Express server
-app.listen( port, () => {
-  console.log( `server started at http://localhost:${ port }`);
-});
+if (process.env.NODE_ENV !== "test") {
+  // start the Express server
+  app.listen( port, () => {
+    console.log( `server started at http://localhost:${ port }`);
+  });
+}
+
+export default app;

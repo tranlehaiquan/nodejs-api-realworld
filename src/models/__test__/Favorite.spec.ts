@@ -1,6 +1,7 @@
 // const mongoose = require('mongoose');
 // const UserModel = require('../User');
 import mongoose from 'mongoose';
+import '../../index';
 import UserModel from '../User';
 import ArticleModel from '../Article';
 import FavoriteArticle from '../Favorite';
@@ -24,19 +25,8 @@ describe('Favorite model test', () => {
   
   // It's just so easy to connect to the MongoDB Memory Server 
   // By using mongoose.connect
-  beforeAll(async () => {
-    await mongoose.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useCreateIndex: true
-    }, (err) => {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-    });
-  });
-
   afterAll(async () => {
+    await mongoose.connection.dropDatabase();
     mongoose.disconnect();
   });
 
