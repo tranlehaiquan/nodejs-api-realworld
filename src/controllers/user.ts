@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { body, validationResult, sanitizeBody } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 
 import { ErrorsValidationResponse, ErrorResponse } from '../models/Error';
 import User from '../models/User';
@@ -12,7 +12,10 @@ const validations = {
     .trim().escape(),
   email: body('email')
     .isEmail().withMessage('Email không hợp lệ!')
-    .normalizeEmail(),
+    .normalizeEmail({
+      gmail_remove_dots: false,
+      gmail_remove_subaddress: false
+    }),
   password: body('password')
     .not().isEmpty().withMessage('Vui lòng điền mật khẩu')
     .isLength({ min: 5 }).withMessage('Mật khẩu phải ít nhất 5 ký tự'),
@@ -66,10 +69,6 @@ export const registerValidation = [
   validations.username,
   validations.password,
   validations.email,
-  sanitizeBody('email').normalizeEmail({
-    gmail_remove_dots: false,
-    gmail_remove_subaddress: false
-  }),
   validations.middleWare,
 ];
 
