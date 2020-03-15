@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/tranlehaiquan/nodejs-api-realworld.svg?branch=master)](https://travis-ci.com/tranlehaiquan/nodejs-api-realworld)
+
 <!-- View Source Button --><a href="https://glitch.com/edit/#!/tranlehaiquan-nodejs-api-realworld">  <img src="https://cdn.glitch.com/2bdfb3f8-05ef-4035-a06e-2043962a3a13%2Fview-source%402x.png?1513093958802" alt="view source" height="33"></a>
 I'm gonna code a RestFul with Express, Typescript
 
