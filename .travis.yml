@@ -1,9 +1,6 @@
 language: node_js
 node_js: 
   - "stable"
-env:
-- TOKEN_KEY="5ce9dffa440937720fbae87fb32c95a5"
-- DATABASE_URI_TEST="mongodb+srv://realword-user:NlVeWnjYd3bZfSUr@cluster0-c1jtn.mongodb.net/test?retryWrites=true&w=majority"
 cache:
   directories:
     - "node_modules"
