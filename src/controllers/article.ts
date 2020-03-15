@@ -11,8 +11,8 @@ import Comment from '../models/Comment';
 const validations = {
   title: body('title')
   .not().isEmpty().withMessage('Vui lòng điền title bài viết')
-    .isLength({ min: 10 }).withMessage('Tên ít nhất 10 ký tự')
-    .isLength({ max: 60 }).withMessage('Tên nhiều nhất 60 ký tự')
+    .isLength({ min: 10 }).withMessage('Tiêu đề ít nhất 10 ký tự')
+    .isLength({ max: 60 }).withMessage('Tiêu đề nhiều nhất 60 ký tự')
     .trim().escape(),
   description: body('description')
   .not().isEmpty().withMessage('Vui lòng điền mô tả bài viết')

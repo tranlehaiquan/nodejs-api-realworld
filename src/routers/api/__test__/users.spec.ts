@@ -7,12 +7,7 @@ function generateRandomEmail() : string {
   return uuidv1() + '@gmail.com';
 }
 
-describe('Article model test', () => {
-  // It's just so easy to connect to the MongoDB Memory Server 
-  // By using mongoose.connect
-  beforeAll(async () => {
-  });
-
+describe('Users api test', () => {
   afterAll(async () => {
     await mongoose.connection.dropDatabase();
     mongoose.disconnect();
@@ -104,10 +99,10 @@ describe('Article model test', () => {
       "password": "12345678",
       "email": email,
     };
-    const resResgister = await request(app)
+    const resRegister = await request(app)
       .post('/api/users/register')
       .send(userData);
-    const { token } = resResgister.body.data.token;
+    const { token } = resRegister.body.data.token;
 
     const resGetCurrentUser = await request(app)
       .get('/api/users/')

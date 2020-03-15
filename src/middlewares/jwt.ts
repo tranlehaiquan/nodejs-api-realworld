@@ -15,7 +15,9 @@ export const AuthOptional = async (req: Request, res: Response, next: NextFuncti
     const user = await verifyJWT(authorization);
     req.user = user;
   } catch (err) {
-    console.log(err);
+    if(!(err instanceof ErrorResponse)) {
+      console.log(err);
+    }
   } finally {
     next();
   }
