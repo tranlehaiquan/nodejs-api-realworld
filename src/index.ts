@@ -9,6 +9,7 @@ import { ErrorResponse } from './models/Error';
 import * as swaggerDocument from './swagger.json';
 
 dotenv.config();
+console.log(process.env);
 // Load .env config
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || '3000';
