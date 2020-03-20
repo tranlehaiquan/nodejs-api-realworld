@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import database from './database';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
+import path from 'path';
 
 import { ErrorResponse } from './models/Error';
 import * as swaggerDocument from './swagger.json';
@@ -24,6 +25,8 @@ if(!isProduction) {
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
+
+app.use(express.static(path.resolve(__dirname, '..', './public')));
 
 // define a route handler for the default home page
 app.use('/', routers);
