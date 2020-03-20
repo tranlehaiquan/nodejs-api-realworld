@@ -1,27 +1,27 @@
-export const normalizeVI = ( str:string ): string => {
-  str = str.toLowerCase();
-  str = str.normalize('NFD');
-  str = str.replace(/[\u0300-\u036f]/g, '');
-  str = str.replace(/[đĐ]/g, m => m === 'đ' ? 'd' : 'D');
+export const normalizeVI = (str: string): string => {
+  let resultStr = str.toLowerCase();
+  resultStr = resultStr.normalize('NFD');
+  resultStr = resultStr.replace(/[\u0300-\u036f]/g, '');
+  resultStr = resultStr.replace(/[đĐ]/g, m => (m === 'đ' ? 'd' : 'D'));
 
-  return str;
-}
+  return resultStr;
+};
 
-export const toSlug = ( str: string): string => {
-  str = normalizeVI(str);
+export const toSlug = (str: string): string => {
+  let resultStr = normalizeVI(str);
 
   // Xóa ký tự đặc biệt
-  str = str.replace(/([^0-9a-z-\s])/g, '');
- 
+  resultStr = resultStr.replace(/([^0-9a-z-\s])/g, '');
+
   // Xóa khoảng trắng thay bằng ký tự -
-  str = str.replace(/(\s+)/g, '-');
-  
+  resultStr = resultStr.replace(/(\s+)/g, '-');
+
   // Xóa ký tự - liên tiếp
-  str = str.replace(/-+/g, '-');
+  resultStr = resultStr.replace(/-+/g, '-');
 
   // xóa phần dư - ở đầu & cuối
-  str = str.replace(/^-+|-+$/g, '');
+  resultStr = resultStr.replace(/^-+|-+$/g, '');
 
   // return
-  return str;
-}
+  return resultStr;
+};

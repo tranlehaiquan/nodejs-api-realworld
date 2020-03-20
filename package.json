@@ -32,7 +32,6 @@
     "@typescript-eslint/parser": "^2.24.0",
     "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.1.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prettier": "^3.1.2",
@@ -58,7 +57,7 @@
     "start": "npm run build && npm run serve",
     "test": "jest --runInBand --detectOpenHandles",
     "seeder": "ts-node ./database/seeder/index.ts",
-    "lint": "eslint ./src/**/*.{ts,js}"
+    "lint": "eslint './src/**/*.{ts,js}'"
   },
   "repository": {
     "type": "git",

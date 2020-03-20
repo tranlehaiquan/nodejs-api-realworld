@@ -11,10 +11,10 @@ const userData = {
 
 const articleData = {
   title: 'hello the world',
-  description: 'i\'m thinking, please don\'t call.',
-  body: 'i\'m thinking, please don\'t call. My name is Quan. I am from Hoi An. Today is hot day.',
+  description: "i'm thinking, please don't call.",
+  body: "i'm thinking, please don't call. My name is Quan. I am from Hoi An. Today is hot day.",
   tagList: ['blog', 'new'],
-}
+};
 
 describe('Article model test', () => {
   afterAll(async () => {
@@ -31,11 +31,11 @@ describe('Article model test', () => {
     });
     const saveArticle = await vaildArticle.save();
 
-    expect(saveArticle._id).toBeDefined();
+    expect(saveArticle.id).toBeDefined();
     expect(saveArticle.slug).toBeDefined();
     expect(saveArticle.description).toBe(articleData.description);
     expect(saveArticle.body).toBe(articleData.body);
     expect(saveArticle.tagList.length).toBe(articleData.tagList.length);
     expect(saveArticle.author.toString()).toEqual(validUser.id.toString());
   });
-})
+});

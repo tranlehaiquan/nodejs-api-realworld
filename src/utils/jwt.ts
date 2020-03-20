@@ -11,35 +11,35 @@ const options = {
 };
 
 export interface Token {
-  token: string,
-  exp: number,
-};
+  token: string;
+  exp: number;
+}
 
 /**
  * Sign jwt to get user access token
  * @param payload user info
  */
-export const signJWT = async (payload: any):Promise<Token> => {
+export const signJWT = async (payload: string | object): Promise<Token> => {
   return new Promise((res, rej) => {
     jwt.sign(payload, process.env.TOKEN_KEY, options, (err, token) => {
-      if(err) rej(err);
+      if (err) rej(err);
       res({
         token,
         exp: addMilliseconds(new Date(), milisecondOfDay).getTime(),
       });
     });
   });
-}
+};
 
 export const verifyJWT = (token: string): string | object => {
   return new Promise((res, rej) => {
     jwt.verify(token, process.env.TOKEN_KEY, (err, decoded) => {
-      if(err) {
-        let message = err.message;
-        if(err.name === 'TokenExpiredError') message = 'Token has been expired';
+      if (err) {
+        let { message } = err;
+        if (err.name === 'TokenExpiredError') message = 'Token has been expired';
         rej(new ErrorResponse(401, message));
       }
       res(decoded);
     });
   });
-}
+};

@@ -1,9 +1,6 @@
 import { Router } from 'express';
 import { getProfile, followProfile, unFollowProfile, paramProfile } from '../../controllers/profile';
-import {
-  AuthRequired,
-  AuthOptional,
-} from '../../middlewares/jwt';
+import { AuthRequired, AuthOptional } from '../../middlewares/jwt';
 
 const route = Router();
 

@@ -14,13 +14,13 @@ const userData = {
 
 const articleData = {
   title: 'hello the world',
-  description: 'i\'m thinking, please don\'t call.',
-  body: 'i\'m thinking, please don\'t call. My name is Quan. I am from Hoi An. Today is hot day.',
+  description: "i'm thinking, please don't call.",
+  body: "i'm thinking, please don't call. My name is Quan. I am from Hoi An. Today is hot day.",
   tagList: ['blog', 'new'],
 };
 
 const commentData = {
-  comment: 'this is comment description. I dont know why this property name is comment : )). That\' stupid name : )).',
+  comment: "this is comment description. I dont know why this property name is comment : )). That' stupid name : )).",
 };
 
 describe('Article model test', () => {
@@ -54,15 +54,15 @@ describe('Article model test', () => {
     const vaildComment = new CommentModel({
       ...commentData,
       username: validUser.username,
-      article_id: vaildArticle.id,
+      articleId: vaildArticle.id,
     });
     const saveComment = await vaildComment.save();
 
     expect(saveComment.id).toBeDefined();
     expect(saveComment.username).toBe(validUser.username);
-    expect(saveComment.article_id.toString()).toEqual(vaildArticle.id.toString());
+    expect(saveComment.articleId.toString()).toEqual(vaildArticle.id.toString());
     expect(saveComment.comment).toBe(commentData.comment);
     expect(saveComment.createdAt).toBeDefined();
     expect(saveComment.updatedAt).toBeDefined();
   });
-})
+});

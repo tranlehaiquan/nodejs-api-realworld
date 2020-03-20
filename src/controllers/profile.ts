@@ -5,26 +5,26 @@ import User from '../models/User';
 /**
  * Database desgin
  * 1 - Put Following list id inside user Modal
- * 2 - Create seperate Follow table to store 
+ * 2 - Create seperate Follow table to store
  */
 
-export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const getProfile = async (req: Request, res: Response): Promise<void> => {
   const { username } = req.params;
   let following = false;
 
-  if(!username) {
-    res.json({data: {}});
+  if (!username) {
+    res.json({ data: {} });
     return;
   }
   const userProfile = await User.findOne({ username });
 
-  if(req.user) {
+  if (req.user) {
     const authUser = await User.findById(req.user.id);
-    const isFollowing = authUser.listFollow.every((profileFollowing) => {
+    const isFollowing = authUser.listFollow.every(profileFollowing => {
       return profileFollowing.id === userProfile.id;
     });
 
-    if(isFollowing && authUser.listFollow.length) following = true;
+    if (isFollowing && authUser.listFollow.length) following = true;
   }
 
   res.json({
@@ -33,34 +33,33 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
       following,
     },
   });
-}
+};
 
-export const paramProfile = async (req: Request, res: Response, next: NextFunction, value: string) => {
+export const paramProfile = async (req: Request, res: Response, next: NextFunction, value: string): Promise<void> => {
   const profile = await User.findOne({ username: value });
 
-  if(!profile) {
-    next(new ErrorResponse(404, 'Can\'t find the article'));
-    return;
+  if (!profile) {
+    next(new ErrorResponse(404, "Can't find the article"));
   } else {
     req.profile = profile;
     next();
   }
-}
+};
 
 // Add profile to followList of User (auth)
 // followList => List of profile follow by User (auth)
-export const followProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const followProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { profile } = req;
   const user = await User.findById(req.user.id);
-  const indexOfProfile = user.listFollow.findIndex((follower) => follower.id === profile.id);
+  const indexOfProfile = user.listFollow.findIndex(follower => follower.id === profile.id);
   const profileIsIncluded = indexOfProfile >= 0;
 
-  if(!user) {
-    next(new ErrorResponse(404, 'Can\'t find the user'));
+  if (!user) {
+    next(new ErrorResponse(404, "Can't find the user"));
     return;
   }
 
-  if(!profileIsIncluded && user.id !== profile.id) {
+  if (!profileIsIncluded && user.id !== profile.id) {
     user.listFollow.push({
       id: profile.id,
       username: profile.username,
@@ -71,20 +70,20 @@ export const followProfile = async (req: Request, res: Response, next: NextFunct
   res.json({
     data: user.listFollow,
   });
-}
+};
 
-export const unFollowProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const unFollowProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { profile } = req;
   const user = await User.findById(req.user.id);
-  const indexOfProfile = user.listFollow.findIndex((follower) => follower.id === profile.id);
+  const indexOfProfile = user.listFollow.findIndex(follower => follower.id === profile.id);
   const profileIsIncluded = indexOfProfile >= 0;
 
-  if(!user) {
-    next(new ErrorResponse(404, 'Can\'t find the user'));
+  if (!user) {
+    next(new ErrorResponse(404, "Can't find the user"));
     return;
   }
 
-  if(profileIsIncluded) {
+  if (profileIsIncluded) {
     user.listFollow.splice(indexOfProfile, 1);
     await user.save();
   }
@@ -92,4 +91,4 @@ export const unFollowProfile = async (req: Request, res: Response, next: NextFun
   res.json({
     data: user.listFollow,
   });
-}
+};
