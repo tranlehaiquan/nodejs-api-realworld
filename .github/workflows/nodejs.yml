@@ -29,3 +29,4 @@ jobs:
     - run: npm test
       env:
         CI: true
+        DATABASE_URI_TEST: mongodb+srv://realword-user:NlVeWnjYd3bZfSUr@cluster0-c1jtn.mongodb.net/test?retryWrites=true&w=majority
