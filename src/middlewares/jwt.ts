@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ErrorResponse } from '../models/Error';
+import ErrorResponse from '../models/Error/ErrorResponse';
 import { verifyJWT } from '../utils/jwt';
 
 /**
@@ -16,7 +16,7 @@ export const AuthOptional = async (req: Request, res: Response, next: NextFuncti
     req.user = user;
   } catch (err) {
     if (!(err instanceof ErrorResponse)) {
-      console.log(err);
+      console.log(err); /* eslint-disable-line no-console */
     }
   } finally {
     next();

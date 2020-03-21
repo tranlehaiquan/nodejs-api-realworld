@@ -10,6 +10,9 @@ Basic mongodb schema: http://learnmongodbthehardway.com/schema/schemabasics
 
 ## DATABASE
 
+Reference-style: 
+![alt text][database design]
+
 ### One to one
 ### One to many
 http://learnmongodbthehardway.com/schema/schemabasics/#one-to-many-1-n
@@ -35,3 +38,5 @@ https://hackernoon.com/restful-api-designing-guidelines-the-best-practices-60e1d
 
 - Database for test: Mongodb memory server
 - Test runner: Jest, Supertest
+
+[database design]: ./public/images/realworld-database.jpg "Logo Title Text 2"

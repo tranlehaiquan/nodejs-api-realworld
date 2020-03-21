@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import addMilliseconds from 'date-fns/addMilliseconds';
 
-import { ErrorResponse } from '../models/Error';
+import ErrorResponse from '../models/Error/ErrorResponse';
 import { milisecondOfDay } from './date';
 
 const secondsOfDay = milisecondOfDay / 1000;

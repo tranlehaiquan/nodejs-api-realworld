@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ErrorResponse } from '../models/Error';
-import User from '../models/User';
+import ErrorResponse from '../models/Error/ErrorResponse';
+import UserModel from '../models/User';
 
 /**
  * Database desgin
@@ -16,10 +16,10 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
     res.json({ data: {} });
     return;
   }
-  const userProfile = await User.findOne({ username });
+  const userProfile = await UserModel.findOne({ username });
 
   if (req.user) {
-    const authUser = await User.findById(req.user.id);
+    const authUser = await UserModel.findById(req.user.id);
     const isFollowing = authUser.listFollow.every(profileFollowing => {
       return profileFollowing.id === userProfile.id;
     });
@@ -36,7 +36,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 };
 
 export const paramProfile = async (req: Request, res: Response, next: NextFunction, value: string): Promise<void> => {
-  const profile = await User.findOne({ username: value });
+  const profile = await UserModel.findOne({ username: value });
 
   if (!profile) {
     next(new ErrorResponse(404, "Can't find the article"));
@@ -50,7 +50,7 @@ export const paramProfile = async (req: Request, res: Response, next: NextFuncti
 // followList => List of profile follow by User (auth)
 export const followProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { profile } = req;
-  const user = await User.findById(req.user.id);
+  const user = await UserModel.findById(req.user.id);
   const indexOfProfile = user.listFollow.findIndex(follower => follower.id === profile.id);
   const profileIsIncluded = indexOfProfile >= 0;
 
@@ -74,7 +74,7 @@ export const followProfile = async (req: Request, res: Response, next: NextFunct
 
 export const unFollowProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { profile } = req;
-  const user = await User.findById(req.user.id);
+  const user = await UserModel.findById(req.user.id);
   const indexOfProfile = user.listFollow.findIndex(follower => follower.id === profile.id);
   const profileIsIncluded = indexOfProfile >= 0;
 

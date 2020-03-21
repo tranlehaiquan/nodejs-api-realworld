@@ -5,7 +5,7 @@ import { Article } from './Article';
 export interface Comment extends Document {
   comment: string;
   username: User['username'];
-  articleId: Article['_id'];
+  articleId: Article['id'];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,7 +14,7 @@ type ExportComment = {
   id: number;
   comment: string;
   username: User['username'];
-  articleId: Article['_id'];
+  articleId: Article['id'];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -37,7 +37,7 @@ const CommentSchema = new Schema(
     toObject: {
       transform(doc: Comment): ExportComment {
         return {
-          id: doc._id,
+          id: doc.id,
           username: doc.username,
           comment: doc.comment,
           articleId: doc.articleId,

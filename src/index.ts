@@ -6,7 +6,7 @@ import path from 'path';
 import database from './database';
 import routers from './routers';
 
-import { ErrorResponse } from './models/Error';
+import ErrorResponse from './models/Error/ErrorResponse';
 import * as swaggerDocument from './swagger.json';
 
 dotenv.config();
@@ -46,7 +46,7 @@ if (!isProduction) {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(error: ErrorResponse, req: Request, res: Response) {
+app.use(function showClientError(error: ErrorResponse, req: Request, res: Response) {
   const { statusCode = 500, message } = error;
   res.status(statusCode).json({
     statusCode,
@@ -57,7 +57,7 @@ app.use(function(error: ErrorResponse, req: Request, res: Response) {
 if (process.env.NODE_ENV !== 'test') {
   // start the Express server
   app.listen(port, () => {
-    console.log(`server started at http://localhost:${port}`);
+    console.log(`server started at http://localhost:${port}`); /* eslint-disable-line no-console */
   });
 }
 

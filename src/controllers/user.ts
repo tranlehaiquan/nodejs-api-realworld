@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 
-import { ErrorsValidationResponse, ErrorResponse } from '../models/Error';
-import User from '../models/User';
+import ErrorResponse from '../models/Error/ErrorResponse';
+import ErrorsValidationResponse from '../models/Error/ErrorsValidationResponse';
+import UserModel from '../models/User';
 import { signJWT } from '../utils/jwt';
 
 const validations = {
@@ -54,7 +55,7 @@ export const loginValidation = [validations.username, validations.password, vali
 
 export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { username, password } = req.body;
-  const user = await User.findOne({ username });
+  const user = await UserModel.findOne({ username });
 
   if (!user) {
     next(new ErrorResponse(401, 'Username or password is incorrect!'));
@@ -87,7 +88,7 @@ export const registerValidation = [
 
 export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { username, email, password } = req.body;
-  const newUser = new User({
+  const newUser = new UserModel({
     email,
     username,
   });
@@ -116,7 +117,7 @@ export async function register(req: Request, res: Response, next: NextFunction):
 export async function getCurrentUserInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.user;
 
-  const user = await User.findById(id);
+  const user = await UserModel.findById(id);
   if (!user) {
     next(new ErrorResponse(404, 'Not found user'));
     return;
@@ -133,7 +134,7 @@ export async function updateCurrentUserInfo(req: Request, res: Response, next: N
   const { bio, image } = req.body;
   const { id } = req.user;
 
-  const user = await User.findById(id);
+  const user = await UserModel.findById(id);
   if (!user) {
     next(new ErrorResponse(404, 'Not found user'));
     return;

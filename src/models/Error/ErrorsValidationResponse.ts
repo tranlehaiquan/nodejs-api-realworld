@@ -1,25 +1,11 @@
 import { Result } from 'express-validator';
 
-export class ErrorResponse extends Error {
-  public statusCode: number;
-
-  public error: string;
-
-  constructor(statusCode: number, message: string) {
-    // easy to trace stack error
-    super(message);
-
-    this.statusCode = statusCode;
-    this.error = message;
-  }
-}
-
 type ErrorsObject = { [key: string]: string };
 /**
  * This ErrosValidationResponse class use to
  * return errors for express validator
  */
-export class ErrorsValidationResponse extends Error {
+export default class ErrorsValidationResponse extends Error {
   public errors: ErrorsObject;
 
   public statusCode: number;
@@ -40,7 +26,9 @@ export class ErrorsValidationResponse extends Error {
 
   public static convertResultToErrorsObject(errors: Result): ErrorsObject {
     const errorsObject: ErrorsObject = {};
-    errors.array().forEach(({ msg, param }: { msg: string; param: string }) => (errorsObject[param] = msg));
+    errors.array().forEach(({ msg, param }: { msg: string; param: string }) => {
+      errorsObject[param] = msg;
+    });
 
     return errorsObject;
   }

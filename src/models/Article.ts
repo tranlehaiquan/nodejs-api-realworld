@@ -3,7 +3,6 @@ import crypto from 'crypto';
 import { toSlug } from '../utils/string';
 
 import { User } from './User';
-import { Comment } from './Comment';
 
 export interface Article extends Document {
   slug: string;
@@ -11,9 +10,10 @@ export interface Article extends Document {
   description: string;
   body: string;
   favoritesCount: number;
-  comments: Comment['_id'];
   tagList: string[];
-  author: User['_id'];
+  author: User['id'];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 type ExportArticle = {
@@ -24,7 +24,9 @@ type ExportArticle = {
   body: string;
   favoritesCount: number;
   tagList: string[];
-  author: User['_id'];
+  author: User['id'];
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 const ArticleShema = new Schema(
@@ -53,12 +55,6 @@ const ArticleShema = new Schema(
       type: Number,
       default: 0,
     },
-    comments: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Comment',
-      },
-    ],
     author: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -71,7 +67,7 @@ const ArticleShema = new Schema(
   {
     toObject: {
       transform: (doc: Article): ExportArticle => ({
-        id: doc._id,
+        id: doc.id,
         slug: doc.slug,
         title: doc.title,
         description: doc.description,
@@ -79,6 +75,8 @@ const ArticleShema = new Schema(
         favoritesCount: doc.favoritesCount,
         author: doc.author,
         tagList: doc.tagList,
+        createdAt: doc.createdAt,
+        updatedAt: doc.updatedAt,
       }),
     },
     timestamps: true,
@@ -87,7 +85,7 @@ const ArticleShema = new Schema(
 
 ArticleShema.index({ slug: 1 }, { unique: true });
 
-ArticleShema.pre('save', function(this: Article, next) {
+ArticleShema.pre('save', function preSave(this: Article, next) {
   if (!this.isNew) {
     next();
     return;

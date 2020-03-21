@@ -1,15 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body as validatorBody, validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import { ErrorResponse, ErrorsValidationResponse } from '../models/Error';
-import Article from '../models/Article';
-import FavoriteArticle from '../models/Favorite';
-import User from '../models/User';
-import Comment from '../models/Comment';
+import ErrorsValidationResponse from '../models/Error/ErrorsValidationResponse';
+import ErrorResponse from '../models/Error/ErrorResponse';
+import ArticleModel from '../models/Article';
+import FavoriteArticleModel from '../models/Favorite';
+import UserModel from '../models/User';
+import CommentModel from '../models/Comment';
 
 const validations = {
-  title: body('title')
+  title: validatorBody('title')
     .not()
     .isEmpty()
     .withMessage('Vui lòng điền title bài viết')
@@ -19,7 +20,7 @@ const validations = {
     .withMessage('Tiêu đề nhiều nhất 60 ký tự')
     .trim()
     .escape(),
-  description: body('description')
+  description: validatorBody('description')
     .not()
     .isEmpty()
     .withMessage('Vui lòng điền mô tả bài viết')
@@ -29,7 +30,7 @@ const validations = {
     .withMessage('Mô tả nhiều nhất 100 ký tự')
     .trim()
     .escape(),
-  body: body('body')
+  body: validatorBody('body')
     .not()
     .isEmpty()
     .withMessage('Vui lòng điền nội dung bài viết')
@@ -59,7 +60,7 @@ export const createArticle = async (req: Request, res: Response): Promise<void> 
   const { title, description, body, tagList } = req.body;
   const authorId = req.user.id;
 
-  const article = new Article({
+  const article = new ArticleModel({
     title,
     description,
     body,
@@ -86,18 +87,18 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
   } = {};
   if (tag) query.tagList = tag.includes(',') ? { $in: tag.split(',') } : tag;
   if (author) {
-    const authorObject = await User.findOne({ username: author });
+    const authorObject = await UserModel.findOne({ username: author });
     query.author = authorObject.id;
   }
 
   if (!favoriteBy) {
-    const articles = Article.find({ ...query })
+    const articles = ArticleModel.find({ ...query })
       .skip(offset)
       .limit(+limit)
       .sort({ createdAt: 'desc' })
       .populate('author')
       .exec();
-    const articlesCount = Article.count(query).exec();
+    const articlesCount = ArticleModel.count(query).exec();
 
     const result = await Promise.all([articles, articlesCount]);
     res.json({
@@ -113,7 +114,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
 
   // if query have favorite by, get list of article
   // by query collection favoriteArticles
-  const userFavorite = await User.findOne({ username: favoriteBy });
+  const userFavorite = await UserModel.findOne({ username: favoriteBy });
 
   // if user not found
   if (!userFavorite) {
@@ -126,7 +127,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
     return;
   }
 
-  const articles = FavoriteArticle.find({ user: userFavorite.id })
+  const articles = FavoriteArticleModel.find({ user: userFavorite.id })
     .skip(offset)
     .limit(+limit)
     .sort({ createdAt: 'desc' })
@@ -137,7 +138,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
       },
     })
     .exec();
-  const articlesCount = FavoriteArticle.count({ user: userFavorite.id }).exec();
+  const articlesCount = FavoriteArticleModel.count({ user: userFavorite.id }).exec();
   const result = await Promise.all([articles, articlesCount]);
 
   res.json({
@@ -155,10 +156,10 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
  */
 export const getArticle = async (req: Request, res: Response): Promise<void> => {
   const { article, user } = req;
-  const numberOfFavorite = await FavoriteArticle.count({ article: article.id });
+  const numberOfFavorite = await FavoriteArticleModel.count({ article: article.id });
   let favorited = false;
   if (user) {
-    const result = await FavoriteArticle.findOne({ article: article.id, user: user.id });
+    const result = await FavoriteArticleModel.findOne({ article: article.id, user: user.id });
     if (result) favorited = true;
   }
 
@@ -200,9 +201,9 @@ export const updateArticle = async (req: Request, res: Response, next: NextFunct
 export const favoriteArticle = async (req: Request, res: Response): Promise<void> => {
   const { article, user } = req;
 
-  const favoriteArticle = await FavoriteArticle.findOne({ user: user.id, article: article.id });
-  if (!favoriteArticle) {
-    const userFavorite = new FavoriteArticle({ user: user.id, article: article.id });
+  const favoriteArticleResult = await FavoriteArticleModel.findOne({ user: user.id, article: article.id });
+  if (!favoriteArticleResult) {
+    const userFavorite = new FavoriteArticleModel({ user: user.id, article: article.id });
     await userFavorite.save();
   }
   res.send({
@@ -213,16 +214,16 @@ export const favoriteArticle = async (req: Request, res: Response): Promise<void
 export const unFavoriteArticle = async (req: Request, res: Response): Promise<void> => {
   const { article, user } = req;
 
-  await FavoriteArticle.deleteOne({ user: mongoose.Types.ObjectId(user.id), article: article.id });
+  await FavoriteArticleModel.deleteOne({ user: mongoose.Types.ObjectId(user.id), article: article.id });
   res.send({
     data: true,
   });
 };
 
 export const slugTrigger = async (req: Request, res: Response, next: NextFunction, slug: string): Promise<void> => {
-  const article = await Article.findOne({ slug });
+  const article = await ArticleModel.findOne({ slug });
   if (!article) {
-    next(new ErrorResponse(404, `Can't find the article`));
+    next(new ErrorResponse(404, "Can't find the article"));
   } else {
     req.article = article;
     next();
@@ -232,7 +233,7 @@ export const slugTrigger = async (req: Request, res: Response, next: NextFunctio
 export const addComment = async (req: Request, res: Response): Promise<void> => {
   const { article, user } = req;
   const { body } = req.body;
-  const newComment = new Comment({
+  const newComment = new CommentModel({
     comment: body,
     articleId: article.id,
     username: user.username,
@@ -245,7 +246,7 @@ export const addComment = async (req: Request, res: Response): Promise<void> => 
       data: newComment.toObject(),
     });
   } catch (err) {
-    console.error(err);
+    console.error(err); /* eslint-disable-line no-console */
     res.json({
       data: false,
     });
@@ -255,11 +256,11 @@ export const addComment = async (req: Request, res: Response): Promise<void> => 
 export const getCommentsByOfArticle = async (req: Request, res: Response): Promise<void> => {
   const { article } = req;
   const { limit = 20, offset = 0 } = req.query;
-  const comments = Comment.find({ articleId: article.id })
+  const comments = CommentModel.find({ articleId: article.id })
     .skip(offset)
     .limit(+limit)
     .sort({ createdAt: 'desc' });
-  const commentCount = Comment.count({ articleId: article.id }).exec();
+  const commentCount = CommentModel.count({ articleId: article.id }).exec();
 
   const result = await Promise.all([comments, commentCount]);
 
@@ -274,7 +275,7 @@ export const getCommentsByOfArticle = async (req: Request, res: Response): Promi
 export const deleteComment = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
 
-  await Comment.deleteOne({ _id: id });
+  await CommentModel.deleteOne({ _id: id });
   res.json({
     data: true,
   });

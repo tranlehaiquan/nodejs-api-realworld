@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ErrorsValidationResponse, ErrorResponse } from '../models/Error';
+import ErrorResponse from '../models/Error/ErrorResponse';
+import ErrorsValidationResponse from '../models/Error/ErrorsValidationResponse';
 
 /**
  * This middleware just use to catch error ErrorsValidationResponse
