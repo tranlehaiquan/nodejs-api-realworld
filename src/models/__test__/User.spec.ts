@@ -22,9 +22,9 @@ describe('User Model Test', () => {
 
     const savedUser = await validUser.save();
     // Object Id should be defined when successfully saved to MongoDB.
-    expect(savedUser._id).toBeDefined();
+    expect(savedUser.id).toBeDefined();
     expect(savedUser.username).toBe(userData.username);
     expect(savedUser.email).toBe(userData.email);
     expect(savedUser.validatePassword(userData.password)).toBeTruthy();
   });
-})
+});

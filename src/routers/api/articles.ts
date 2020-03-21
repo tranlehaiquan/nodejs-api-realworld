@@ -1,6 +1,4 @@
-import {
-  Router
-} from 'express';
+import { Router } from 'express';
 import {
   createArticle,
   createArticleValidation,
@@ -15,10 +13,7 @@ import {
   addComment,
   deleteComment,
 } from '../../controllers/article';
-import {
-  AuthRequired,
-  AuthOptional,
-} from '../../middlewares/jwt';
+import { AuthRequired, AuthOptional } from '../../middlewares/jwt';
 
 const route = Router();
 
@@ -27,7 +22,7 @@ const route = Router();
 // create article
 route.post('/', AuthRequired, createArticleValidation, createArticle);
 // get article
-route.get('/',AuthOptional , getArticles);
+route.get('/', AuthOptional, getArticles);
 
 route.param('slug', slugTrigger);
 

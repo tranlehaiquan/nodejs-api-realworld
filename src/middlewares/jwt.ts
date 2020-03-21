@@ -1,35 +1,37 @@
 import { Request, Response, NextFunction } from 'express';
-import { ErrorResponse } from '../models/Error';
+import ErrorResponse from '../models/Error/ErrorResponse';
 import { verifyJWT } from '../utils/jwt';
 
 /**
  * Verify JWT
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-export const AuthOptional = async (req: Request, res: Response, next: NextFunction) => {
+export const AuthOptional = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { authorization } = req.headers;
 
   try {
     const user = await verifyJWT(authorization);
     req.user = user;
   } catch (err) {
-    console.log(err);
+    if (!(err instanceof ErrorResponse)) {
+      console.log(err); /* eslint-disable-line no-console */
+    }
   } finally {
     next();
   }
 };
 
-export const AuthRequired = async (req: Request, res: Response, next: NextFunction) => {
+export const AuthRequired = async (req: Request, res: Response, next: NextFunction): Promise<boolean | void> => {
   const { authorization } = req.headers;
 
-  if(!authorization) {
+  if (!authorization) {
     next(new ErrorResponse(401, 'This route need token to be access'));
     return;
   }
 
-  if(!authorization.startsWith('Bearer')) {
+  if (!authorization.startsWith('Bearer')) {
     next(new ErrorResponse(401, 'Invaild access token'));
     return;
   }
@@ -41,6 +43,6 @@ export const AuthRequired = async (req: Request, res: Response, next: NextFuncti
   } catch (err) {
     next(err);
   }
-}
+};
 
 export default AuthRequired;

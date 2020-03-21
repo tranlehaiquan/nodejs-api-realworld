@@ -1,32 +1,46 @@
 import { Request, Response, NextFunction } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body as validatorBody, validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import { ErrorResponse, ErrorsValidationResponse } from '../models/Error';
-import Article from '../models/Article';
-import FavoriteArticle from '../models/Favorite';
-import User from '../models/User';
-import Comment from '../models/Comment';
+import ErrorsValidationResponse from '../models/Error/ErrorsValidationResponse';
+import ErrorResponse from '../models/Error/ErrorResponse';
+import ArticleModel from '../models/Article';
+import FavoriteArticleModel from '../models/Favorite';
+import UserModel from '../models/User';
+import CommentModel from '../models/Comment';
 
 const validations = {
-  title: body('title')
-  .not().isEmpty().withMessage('Vui lòng điền title bài viết')
-    .isLength({ min: 10 }).withMessage('Tên ít nhất 10 ký tự')
-    .isLength({ max: 60 }).withMessage('Tên nhiều nhất 60 ký tự')
-    .trim().escape(),
-  description: body('description')
-  .not().isEmpty().withMessage('Vui lòng điền mô tả bài viết')
-    .isLength({ min: 20 }).withMessage('Mô tả ít nhất 20 ký tự')
-    .isLength({ max: 100 }).withMessage('Mô tả nhiều nhất 100 ký tự')
-    .trim().escape(),
-  body: body('body')
-  .not().isEmpty().withMessage('Vui lòng điền nội dung bài viết')
-    .isLength({ min: 50 }).withMessage('Nội dung bài ít nhất 50 ký tự')
+  title: validatorBody('title')
+    .not()
+    .isEmpty()
+    .withMessage('Vui lòng điền title bài viết')
+    .isLength({ min: 10 })
+    .withMessage('Tiêu đề ít nhất 10 ký tự')
+    .isLength({ max: 60 })
+    .withMessage('Tiêu đề nhiều nhất 60 ký tự')
+    .trim()
+    .escape(),
+  description: validatorBody('description')
+    .not()
+    .isEmpty()
+    .withMessage('Vui lòng điền mô tả bài viết')
+    .isLength({ min: 20 })
+    .withMessage('Mô tả ít nhất 20 ký tự')
+    .isLength({ max: 100 })
+    .withMessage('Mô tả nhiều nhất 100 ký tự')
+    .trim()
+    .escape(),
+  body: validatorBody('body')
+    .not()
+    .isEmpty()
+    .withMessage('Vui lòng điền nội dung bài viết')
+    .isLength({ min: 50 })
+    .withMessage('Nội dung bài ít nhất 50 ký tự')
     .trim(),
-  middleWare: async (req: Request, res: Response, next: NextFunction) => {  
+  middleWare: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const errors = validationResult(req);
 
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       next(new ErrorsValidationResponse(errors));
       return;
     }
@@ -42,11 +56,11 @@ export const createArticleValidation = [
   validations.middleWare,
 ];
 
-export const createArticle = async (req: Request, res: Response) => {
+export const createArticle = async (req: Request, res: Response): Promise<void> => {
   const { title, description, body, tagList } = req.body;
   const authorId = req.user.id;
 
-  const article = new Article({
+  const article = new ArticleModel({
     title,
     description,
     body,
@@ -57,7 +71,7 @@ export const createArticle = async (req: Request, res: Response) => {
   await article.save();
 
   res.json({
-    data: article.toObject()
+    data: article.toObject(),
   });
 };
 
@@ -65,88 +79,88 @@ export const createArticle = async (req: Request, res: Response) => {
  * /articles/
  * Get articles
  */
-export const getArticles = async (req: Request, res: Response) => {
+export const getArticles = async (req: Request, res: Response): Promise<void> => {
   const { tag = '', author, limit = 20, offset = 0, favoriteBy = '' } = req.query;
-  let query: {
-    tagList?: string,
-    author?: string,
+  const query: {
+    tagList?: string;
+    author?: string;
   } = {};
-  if(tag) query.tagList = tag.includes(',') ? { $in: tag.split(',')} : tag;
-  if(author) {
-    const authorObject = await User.findOne({ username: author });
+  if (tag) query.tagList = tag.includes(',') ? { $in: tag.split(',') } : tag;
+  if (author) {
+    const authorObject = await UserModel.findOne({ username: author });
     query.author = authorObject.id;
   }
 
-  if(!favoriteBy) {
-    const articles = Article.find({ ...query })
+  if (!favoriteBy) {
+    const articles = ArticleModel.find({ ...query })
       .skip(offset)
       .limit(+limit)
-      .sort({createdAt: 'desc'})
+      .sort({ createdAt: 'desc' })
       .populate('author')
       .exec();
-    const articlesCount = Article.count(query).exec();
-  
+    const articlesCount = ArticleModel.count(query).exec();
+
     const result = await Promise.all([articles, articlesCount]);
     res.json({
       data: {
-        articles: result[0].map((article) => ({
-          ...article.toObject()
+        articles: result[0].map(article => ({
+          ...article.toObject(),
         })),
         articlesCount: result[1],
-      }
+      },
     });
     return;
   }
 
   // if query have favorite by, get list of article
   // by query collection favoriteArticles
-  const userFavorite = await User.findOne({ username: favoriteBy });
-  
+  const userFavorite = await UserModel.findOne({ username: favoriteBy });
+
   // if user not found
-  if(!userFavorite) {
+  if (!userFavorite) {
     res.json({
       data: {
         articles: [],
         articlesCount: 0,
-      }
+      },
     });
     return;
   }
 
-  const articles = FavoriteArticle.find({ user: userFavorite.id })
+  const articles = FavoriteArticleModel.find({ user: userFavorite.id })
     .skip(offset)
     .limit(+limit)
-    .sort({createdAt: 'desc'})  
+    .sort({ createdAt: 'desc' })
     .populate({
       path: 'article',
       populate: {
         path: 'author',
-      }
+      },
     })
     .exec();
-  const articlesCount = FavoriteArticle.count({ user: userFavorite.id }).exec();
+  const articlesCount = FavoriteArticleModel.count({ user: userFavorite.id }).exec();
   const result = await Promise.all([articles, articlesCount]);
 
   res.json({
     data: {
-      articles: result[0].map((article) => ({
-        ...article.toObject()
+      articles: result[0].map(article => ({
+        ...article.toObject(),
       })),
       articlesCount: result[1],
-    }
+    },
   });
 };
 
 /**
  * /articles/:slug
  */
-export const getArticle = async (req: Request, res: Response) => {
+export const getArticle = async (req: Request, res: Response): Promise<void> => {
   const { article, user } = req;
-  const numberOfFavorite = await FavoriteArticle.count({ article: article.id });
+  const numberOfFavorite = await FavoriteArticleModel.count({ article: article.id });
   let favorited = false;
-  if(user) {
-    const result = await FavoriteArticle.findOne({ article: article.id, user: user.id });
-    if(result) favorited = true;
+  if (user) {
+    const result = await FavoriteArticleModel.findOne({ article: article.id, user: user.id });
+    if (result) favorited = true;
   }
 
   res.json({
@@ -159,23 +173,23 @@ export const getArticle = async (req: Request, res: Response) => {
 export const updateArticleValidation = [
   validations.title,
   validations.description,
-  validations.body, 
+  validations.body,
   validations.middleWare,
 ];
 
-export const updateArticle = async (req: Request, res: Response, next: NextFunction) => {
+export const updateArticle = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { title, description, body, tagList } = req.body;
-  const article = req.article;
+  const { article } = req;
 
-  if(article.author !== req.user.id) {
-    next(new ErrorResponse(404, 'You don\'t have permission to update article'));
+  if (article.author !== req.user.id) {
+    next(new ErrorResponse(404, "You don't have permission to update article"));
     return;
   }
 
-  if(title) article.title = title;
-  if(description) article.description = description;
-  if(body) article.body = body;
-  if(tagList) article.tagList = tagList;
+  if (title) article.title = title;
+  if (description) article.description = description;
+  if (body) article.body = body;
+  if (tagList) article.tagList = tagList;
 
   await article.save();
 
@@ -184,45 +198,44 @@ export const updateArticle = async (req: Request, res: Response, next: NextFunct
   });
 };
 
-export const favoriteArticle = async (req: Request, res: Response, next: NextFunction) => {
+export const favoriteArticle = async (req: Request, res: Response): Promise<void> => {
   const { article, user } = req;
 
-  const favoriteArticle = await FavoriteArticle.findOne({ user: user.id, article: article.id });
-  if(!favoriteArticle) {
-    const userFavorite = new FavoriteArticle({ user: user.id, article: article.id });
+  const favoriteArticleResult = await FavoriteArticleModel.findOne({ user: user.id, article: article.id });
+  if (!favoriteArticleResult) {
+    const userFavorite = new FavoriteArticleModel({ user: user.id, article: article.id });
     await userFavorite.save();
   }
   res.send({
     data: true,
   });
-}
+};
 
-export const unFavoriteArticle = async (req: Request, res: Response, next: NextFunction) => {
+export const unFavoriteArticle = async (req: Request, res: Response): Promise<void> => {
   const { article, user } = req;
 
-  await FavoriteArticle.deleteOne({ user: mongoose.Types.ObjectId(user.id), article: article.id });
+  await FavoriteArticleModel.deleteOne({ user: mongoose.Types.ObjectId(user.id), article: article.id });
   res.send({
     data: true,
   });
-}
+};
 
-export const slugTrigger = async (req: Request, res: Response, next: NextFunction, slug:string) => {
-  const article = await Article.findOne({ slug });
-  if(!article) {
-    next(new ErrorResponse(404, 'Can\'t find the article'));
-    return;
+export const slugTrigger = async (req: Request, res: Response, next: NextFunction, slug: string): Promise<void> => {
+  const article = await ArticleModel.findOne({ slug });
+  if (!article) {
+    next(new ErrorResponse(404, "Can't find the article"));
   } else {
     req.article = article;
     next();
   }
-}
+};
 
-export const addComment = async (req: Request, res: Response, next: NextFunction) => {
+export const addComment = async (req: Request, res: Response): Promise<void> => {
   const { article, user } = req;
   const { body } = req.body;
-  const newComment = new Comment({
+  const newComment = new CommentModel({
     comment: body,
-    article_id: article.id,
+    articleId: article.id,
     username: user.username,
   });
 
@@ -230,40 +243,39 @@ export const addComment = async (req: Request, res: Response, next: NextFunction
     await newComment.save();
 
     res.json({
-      data: newComment.toObject(), 
+      data: newComment.toObject(),
     });
-  } catch(err) {
-    console.error(err);
+  } catch (err) {
+    console.error(err); /* eslint-disable-line no-console */
     res.json({
-      data: false, 
+      data: false,
     });
   }
 };
 
-export const getCommentsByOfArticle = async (req: Request, res: Response, next: NextFunction) => {
+export const getCommentsByOfArticle = async (req: Request, res: Response): Promise<void> => {
   const { article } = req;
   const { limit = 20, offset = 0 } = req.query;
-  const comments = Comment
-    .find({ article_id: article.id })
+  const comments = CommentModel.find({ articleId: article.id })
     .skip(offset)
     .limit(+limit)
-    .sort({createdAt: 'desc'});
-  const commentCount = Comment.count({ article_id: article.id }).exec();
+    .sort({ createdAt: 'desc' });
+  const commentCount = CommentModel.count({ articleId: article.id }).exec();
 
-  const result = await Promise.all([ comments, commentCount ])
+  const result = await Promise.all([comments, commentCount]);
 
   res.json({
     data: {
-      comments: result[0].map((comment) => comment.toObject()),
+      comments: result[0].map(comment => comment.toObject()),
       commentsCount: result[1],
     },
   });
 };
 
-export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteComment = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
 
-  await Comment.deleteOne({ _id: id });
+  await CommentModel.deleteOne({ _id: id });
   res.json({
     data: true,
   });

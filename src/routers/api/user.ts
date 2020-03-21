@@ -1,6 +1,4 @@
-  import {
-  Router
-} from 'express';
+import { Router } from 'express';
 import {
   login,
   registerValidation,
@@ -8,11 +6,9 @@ import {
   getCurrentUserInfo,
   updateCurrentUserInfo,
   loginValidation,
-  updateCurrentUserValidation
+  updateCurrentUserValidation,
 } from '../../controllers/user';
-import {
-  AuthRequired,
-} from '../../middlewares/jwt';
+import { AuthRequired } from '../../middlewares/jwt';
 
 const route = Router();
 

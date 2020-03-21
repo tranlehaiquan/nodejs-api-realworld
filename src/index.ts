@@ -1,11 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
-import routers from './routers';
 import morgan from 'morgan';
-import database from './database';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
+import path from 'path';
+import database from './database';
+import routers from './routers';
 
-import { ErrorResponse } from './models/Error';
+import ErrorResponse from './models/Error/ErrorResponse';
 import * as swaggerDocument from './swagger.json';
 
 dotenv.config();
@@ -19,23 +20,25 @@ app.use(express.urlencoded());
 app.use(express.json());
 
 // logger
-if(!isProduction) {
+if (!isProduction) {
   app.use(morgan('dev'));
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
+
+app.use(express.static(path.resolve(__dirname, '..', './public')));
 
 // define a route handler for the default home page
 app.use('/', routers);
 
 // 404 NOT FOUND
 app.use((req: Request, res: Response, next: NextFunction) => {
-  var err = new ErrorResponse(404, 'Not Found');
+  const err = new ErrorResponse(404, 'Not Found');
   next(err);
 });
 
-if(!isProduction) {
-  app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+if (!isProduction) {
+  app.use((error: any, req: Request, res: Response) => {
     res.status(error.status || 500);
     res.json(error.stack);
   });
@@ -43,7 +46,7 @@ if(!isProduction) {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(error: ErrorResponse, req: Request, res: Response, next: NextFunction) {
+app.use(function showClientError(error: ErrorResponse, req: Request, res: Response) {
   const { statusCode = 500, message } = error;
   res.status(statusCode).json({
     statusCode,
@@ -51,10 +54,10 @@ app.use(function(error: ErrorResponse, req: Request, res: Response, next: NextFu
   });
 });
 
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== 'test') {
   // start the Express server
-  app.listen( port, () => {
-    console.log( `server started at http://localhost:${ port }`);
+  app.listen(port, () => {
+    console.log(`server started at http://localhost:${port}`); /* eslint-disable-line no-console */
   });
 }
 
