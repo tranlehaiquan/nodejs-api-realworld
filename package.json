@@ -60,7 +60,8 @@
     "test": "jest --runInBand --detectOpenHandles",
     "seeder": "ts-node ./database/seeder/index.ts",
     "lint": "eslint './src/**/*.{ts,js}'",
-    "lint:fix": "npm run lint -- --fix "
+		"lint:fix": "npm run lint -- --fix",
+		"coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",

@@ -8,7 +8,7 @@ export default async (): Promise<void> => {
   if (process.env.NODE_ENV === 'test') databaseUri = process.env.DATABASE_URI_TEST;
 
   try {
-    mongoose.set('debug', process.env.NODE_ENV === 'production' && true);
+    mongoose.set('debug', process.env.NODE_ENV === 'development' && true);
     await mongoose.connect(databaseUri, { useNewUrlParser: true });
   } catch (err) {
     console.error('Failed to connect to database ', err); /* eslint-disable-line no-console */

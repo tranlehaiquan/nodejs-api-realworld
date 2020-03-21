@@ -91,7 +91,7 @@ UserSchema.pre('save', function preSave(this: User, next) {
       .createHash('md5')
       .update(this.email)
       .digest('hex');
-    this.image = `https://gravatar.com/avatar/${hashEmail}?s=200`;
+    this.image = `https://gravatar.com/avatar/${hashEmail}?s=200&d=identicon`;
   }
   next();
 });
