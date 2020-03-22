@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
+import compression from 'compression';
 import path from 'path';
 import database from './database';
 import routers from './routers';
@@ -18,6 +19,7 @@ database();
 const app = express();
 app.use(express.urlencoded());
 app.use(express.json());
+app.use(compression());
 
 // logger
 if (!isProduction) {
