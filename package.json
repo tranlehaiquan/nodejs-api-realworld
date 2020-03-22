@@ -54,7 +54,7 @@
     "uuid": "^7.0.2"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "preserve": "npm run build",
     "serve": "node -r dotenv/config ./dist/index.js",
     "dev": "nodemon -- -r dotenv/config ./src/index.ts",
