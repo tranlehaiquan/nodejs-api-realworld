@@ -4,6 +4,8 @@ import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
 import compression from 'compression';
 import path from 'path';
+import cors from 'cors';
+
 import database from './database';
 import routers from './routers';
 
@@ -30,6 +32,7 @@ if (!isProduction) {
 
 app.use(express.static(path.resolve(__dirname, '..', './public')));
 
+app.use(cors());
 // define a route handler for the default home page
 app.use('/', routers);
 
