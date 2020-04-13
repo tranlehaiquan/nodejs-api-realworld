@@ -15,13 +15,13 @@ export interface User extends Document {
   }[];
 }
 
-type UserExport = {
+export interface UserExport {
   id: number;
   email: string;
   username: string;
   bio?: string;
   image?: string;
-};
+}
 
 const UserSchema = new Schema(
   {
