@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 import ErrorResponse from '../models/Error/ErrorResponse';
 import ErrorsValidationResponse from '../models/Error/ErrorsValidationResponse';
-import UserModel from '../models/User';
+import UserModel, { UserExport } from '../models/User';
 import { signJWT } from '../utils/jwt';
 
 const validations = {
@@ -68,12 +68,13 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     next(new ErrorResponse(401, 'Username or password is incorrect!'));
     return;
   }
+  const userInfo: UserExport = user.toObject();
 
-  const token = await signJWT(user.toObject());
+  const token = await signJWT(userInfo);
 
   res.json({
     data: {
-      ...user.toObject(),
+      ...userInfo,
       token,
     },
   });
@@ -96,11 +97,12 @@ export async function register(req: Request, res: Response, next: NextFunction):
   try {
     newUser.setPassword(password);
     const user = await newUser.save();
-    const token = await signJWT(user.toObject());
+    const userInfo: UserExport = user.toObject();
+    const token = await signJWT(userInfo);
 
     res.json({
       data: {
-        ...user.toObject(),
+        ...userInfo,
         token,
       },
     });

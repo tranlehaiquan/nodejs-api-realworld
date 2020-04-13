@@ -16,7 +16,7 @@ export default async () => {
       const newUser = new UserModel(userData);
       newUser.setPassword(userData.password);
   
-      newUser.save();
+      await newUser.save();
       console.log(userData);
     }
     console.log('Successful seed data user');
