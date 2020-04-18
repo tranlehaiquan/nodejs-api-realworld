@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import ErrorResponse from '../models/Error/ErrorResponse';
+import UserModel from '../models/User';
 import { verifyJWT } from '../utils/jwt';
 
 /**
@@ -11,19 +12,30 @@ import { verifyJWT } from '../utils/jwt';
 export const AuthOptional = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { authorization } = req.headers;
 
+  if (!authorization) {
+    next();
+    return;
+  }
+
   try {
-    const user = await verifyJWT(authorization);
-    req.user = user;
+    const user = await verifyJWT(authorization.split(' ')[1]);
+    const userDocument = await UserModel.findById(user.id);
+    if (!userDocument) {
+      next(new ErrorResponse(404, 'Your account is invalid'));
+      return;
+    }
+    req.user = userDocument;
+    next();
   } catch (err) {
     if (!(err instanceof ErrorResponse)) {
       console.log(err); /* eslint-disable-line no-console */
+    } else {
+      next(err);
     }
-  } finally {
-    next();
   }
 };
 
-export const AuthRequired = async (req: Request, res: Response, next: NextFunction): Promise<boolean | void> => {
+export const AuthRequired = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { authorization } = req.headers;
 
   if (!authorization) {
@@ -38,7 +50,12 @@ export const AuthRequired = async (req: Request, res: Response, next: NextFuncti
 
   try {
     const user = await verifyJWT(authorization.split(' ')[1]);
-    req.user = user;
+    const userDocument = await UserModel.findById(user.id);
+    if (!userDocument) {
+      next(new ErrorResponse(404, 'Your account is invalid'));
+      return;
+    }
+    req.user = userDocument;
     next();
   } catch (err) {
     next(err);

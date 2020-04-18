@@ -116,17 +116,11 @@ export async function register(req: Request, res: Response, next: NextFunction):
  * @param req
  * @param res
  */
-export async function getCurrentUserInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const { id } = req.user;
-
-  const user = await UserModel.findById(id);
-  if (!user) {
-    next(new ErrorResponse(404, 'Not found user'));
-    return;
-  }
+export async function getCurrentUserInfo(req: Request, res: Response): Promise<void> {
+  const userLogined = req.user;
 
   res.json({
-    data: user.toObject(),
+    data: userLogined.toObject(),
   });
 }
 
@@ -134,22 +128,16 @@ export const updateCurrentUserValidation = [validations.bio, validations.image, 
 
 export async function updateCurrentUserInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { bio, image } = req.body;
-  const { id } = req.user;
-
-  const user = await UserModel.findById(id);
-  if (!user) {
-    next(new ErrorResponse(404, 'Not found user'));
-    return;
-  }
+  const userLogined = req.user;
 
   try {
-    if (bio) user.bio = bio;
-    if (image) user.image = image;
+    if (bio) userLogined.bio = bio;
+    if (image) userLogined.image = image;
 
-    await user.save();
+    await userLogined.save();
 
     res.json({
-      data: user.toObject(),
+      data: userLogined.toObject(),
     });
   } catch (err) {
     next(new ErrorResponse(400, err.message));

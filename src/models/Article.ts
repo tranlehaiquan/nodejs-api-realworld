@@ -4,6 +4,13 @@ import { toSlug } from '../utils/string';
 
 import { User } from './User';
 
+export interface ArticleRequestQuery {
+  tagList?: string;
+  limit?: number;
+  offset?: number;
+  favoriteBy?: string;
+  author?: string;
+}
 export interface Article extends Document {
   slug: string;
   title: string;

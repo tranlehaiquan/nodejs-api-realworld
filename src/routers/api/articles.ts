@@ -4,6 +4,7 @@ import {
   createArticleValidation,
   getArticle,
   getArticles,
+  getArticleFromFollowers,
   updateArticleValidation,
   updateArticle,
   slugTrigger,
@@ -23,6 +24,8 @@ const route = Router();
 route.post('/', AuthRequired, createArticleValidation, createArticle);
 // get article
 route.get('/', AuthOptional, getArticles);
+// get articles which user follow
+route.get('/feed', AuthRequired, getArticleFromFollowers);
 
 route.param('slug', slugTrigger);
 

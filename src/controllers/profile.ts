@@ -19,7 +19,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
   const userProfile = await UserModel.findOne({ username });
 
   if (req.user) {
-    const authUser = await UserModel.findById(req.user.id);
+    const authUser = req.user;
     const isFollowing = authUser.listFollow.every(profileFollowing => {
       return profileFollowing.id === userProfile.id;
     });
@@ -39,7 +39,7 @@ export const paramProfile = async (req: Request, res: Response, next: NextFuncti
   const profile = await UserModel.findOne({ username: value });
 
   if (!profile) {
-    next(new ErrorResponse(404, "Can't find the article"));
+    next(new ErrorResponse(404, "Can't find the profile"));
   } else {
     req.profile = profile;
     next();
@@ -49,46 +49,49 @@ export const paramProfile = async (req: Request, res: Response, next: NextFuncti
 // Add profile to followList of User (auth)
 // followList => List of profile follow by User (auth)
 export const followProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { profile } = req;
-  const user = await UserModel.findById(req.user.id);
-  const indexOfProfile = user.listFollow.findIndex(follower => follower.id === profile.id);
-  const profileIsIncluded = indexOfProfile >= 0;
+  const { profile: profileTarget } = req;
+  const userLogined = req.user;
 
-  if (!user) {
-    next(new ErrorResponse(404, "Can't find the user"));
+  const indexOfProfile = userLogined.listFollow.findIndex(follower => follower.id === profileTarget.id);
+  const profileIsIncluded = indexOfProfile >= 0;
+  const isSameUser = userLogined.id === profileTarget.id;
+
+  if (isSameUser) {
+    next(new ErrorResponse(400, 'You can not follow yourself!'));
     return;
   }
 
-  if (!profileIsIncluded && user.id !== profile.id) {
-    user.listFollow.push({
-      id: profile.id,
-      username: profile.username,
+  if (!profileIsIncluded) {
+    userLogined.listFollow.push({
+      id: profileTarget.id,
+      username: profileTarget.username,
     });
-    await user.save();
+    await userLogined.save();
   }
 
   res.json({
-    data: user.listFollow,
+    data: userLogined.listFollow,
   });
 };
 
 export const unFollowProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { profile } = req;
-  const user = await UserModel.findById(req.user.id);
-  const indexOfProfile = user.listFollow.findIndex(follower => follower.id === profile.id);
+  const { profile: profileTarget } = req;
+  const userLogined = req.user;
+  const indexOfProfile = userLogined.listFollow.findIndex(follower => follower.id === profileTarget.id);
   const profileIsIncluded = indexOfProfile >= 0;
+  const isSameUser = userLogined.id === profileTarget.id;
 
-  if (!user) {
-    next(new ErrorResponse(404, "Can't find the user"));
+  if (isSameUser) {
+    next(new ErrorResponse(400, 'You can not unfollow yourself!'));
     return;
   }
 
   if (profileIsIncluded) {
-    user.listFollow.splice(indexOfProfile, 1);
-    await user.save();
+    userLogined.listFollow.splice(indexOfProfile, 1);
+    await userLogined.save();
   }
 
   res.json({
-    data: user.listFollow,
+    data: userLogined.listFollow,
   });
 };
