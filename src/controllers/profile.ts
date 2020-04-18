@@ -56,8 +56,8 @@ export const followProfile = async (req: Request, res: Response, next: NextFunct
   const profileIsIncluded = indexOfProfile >= 0;
   const isSameUser = userLogined.id === profileTarget.id;
 
-  if(isSameUser) {
-    next(new ErrorResponse(400, "You can not follow yourself!"));
+  if (isSameUser) {
+    next(new ErrorResponse(400, 'You can not follow yourself!'));
     return;
   }
 
@@ -81,8 +81,8 @@ export const unFollowProfile = async (req: Request, res: Response, next: NextFun
   const profileIsIncluded = indexOfProfile >= 0;
   const isSameUser = userLogined.id === profileTarget.id;
 
-  if(isSameUser) {
-    next(new ErrorResponse(400, "You can not unfollow yourself!"));
+  if (isSameUser) {
+    next(new ErrorResponse(400, 'You can not unfollow yourself!'));
     return;
   }
 

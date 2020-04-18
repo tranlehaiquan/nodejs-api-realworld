@@ -85,7 +85,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
   if (tag) query.tagList = tag.includes(',') ? { $in: tag.split(',') } : tag;
   if (author) {
     const authorObject = await UserModel.findOne({ username: author });
-    if(!authorObject) {
+    if (!authorObject) {
       res.json({
         data: {
           articles: [],
@@ -160,7 +160,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
 export const getArticleFromFollowers = async (req: Request, res: Response): Promise<void> => {
   const { tag = '', limit = 20, offset = 0 } = req.query;
   const { user } = req;
-  if(!user.listFollow.length) {
+  if (!user.listFollow.length) {
     res.json([]);
     return;
   }
@@ -169,14 +169,14 @@ export const getArticleFromFollowers = async (req: Request, res: Response): Prom
   if (tag) query.tagList = tag.includes(',') ? { $in: tag.split(',') } : tag;
 
   // list all follower id
-  const followersId = user.listFollow.map((author) => author.id);
+  const followersId = user.listFollow.map(author => author.id);
   const articles = await ArticleModel.find({ author: { $in: followersId }, ...query })
     .skip(+offset)
     .limit(+limit)
     .sort({ createdAt: 'desc' })
     .populate('author')
     .exec();
-  const articlesCount = ArticleModel.count({...query, author: { $in: followersId }}).exec();
+  const articlesCount = ArticleModel.count({ ...query, author: { $in: followersId } }).exec();
   const result = await Promise.all([articles, articlesCount]);
 
   res.json({

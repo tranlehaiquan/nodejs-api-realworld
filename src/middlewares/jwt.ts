@@ -12,16 +12,16 @@ import { verifyJWT } from '../utils/jwt';
 export const AuthOptional = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { authorization } = req.headers;
 
-  if(!authorization) {
+  if (!authorization) {
     next();
     return;
-  };
+  }
 
   try {
     const user = await verifyJWT(authorization.split(' ')[1]);
     const userDocument = await UserModel.findById(user.id);
     if (!userDocument) {
-      next(new ErrorResponse(404, "Your account is invalid"));
+      next(new ErrorResponse(404, 'Your account is invalid'));
       return;
     }
     req.user = userDocument;
@@ -52,7 +52,7 @@ export const AuthRequired = async (req: Request, res: Response, next: NextFuncti
     const user = await verifyJWT(authorization.split(' ')[1]);
     const userDocument = await UserModel.findById(user.id);
     if (!userDocument) {
-      next(new ErrorResponse(404, "Your account is invalid"));
+      next(new ErrorResponse(404, 'Your account is invalid'));
       return;
     }
     req.user = userDocument;

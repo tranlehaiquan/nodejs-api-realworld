@@ -116,7 +116,7 @@ export async function register(req: Request, res: Response, next: NextFunction):
  * @param req
  * @param res
  */
-export async function getCurrentUserInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getCurrentUserInfo(req: Request, res: Response): Promise<void> {
   const userLogined = req.user;
 
   res.json({
@@ -128,7 +128,6 @@ export const updateCurrentUserValidation = [validations.bio, validations.image, 
 
 export async function updateCurrentUserInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { bio, image } = req.body;
-  const { id } = req.user;
   const userLogined = req.user;
 
   try {
