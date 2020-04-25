@@ -80,7 +80,7 @@ export const createArticle = async (req: Request, res: Response): Promise<void> 
  * Get articles
  */
 export const getArticles = async (req: Request, res: Response): Promise<void> => {
-  const { tag = '', author, limit = 20, offset = 0, favoriteBy = '' } = req.query;
+  const { tag = '', author = '', limit = 20, offset = 0, favoriteBy = '' } = req.query;
   const query: ArticleRequestQuery = {};
   if (tag) query.tagList = tag.includes(',') ? { $in: tag.split(',') } : tag;
   if (author) {
@@ -90,6 +90,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
         data: {
           articles: [],
           articlesCount: 0,
+          limit,
         },
       });
       return;
@@ -113,6 +114,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
           ...article.toObject(),
         })),
         articlesCount: result[1],
+        limit,
       },
     });
     return;
@@ -128,6 +130,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
       data: {
         articles: [],
         articlesCount: 0,
+        limit,
       },
     });
     return;
@@ -153,6 +156,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
         ...article.toObject(),
       })),
       articlesCount: result[1],
+      limit,
     },
   });
 };
@@ -161,7 +165,12 @@ export const getArticleFromFollowers = async (req: Request, res: Response): Prom
   const { tag = '', limit = 20, offset = 0 } = req.query;
   const { user } = req;
   if (!user.listFollow.length) {
-    res.json([]);
+    res.json({
+      data: {
+        articles: [],
+        articlesCount: 0,
+      },
+    });
     return;
   }
 
@@ -261,7 +270,7 @@ export const unFavoriteArticle = async (req: Request, res: Response): Promise<vo
 };
 
 export const slugTrigger = async (req: Request, res: Response, next: NextFunction, slug: string): Promise<void> => {
-  const article = await ArticleModel.findOne({ slug });
+  const article = await ArticleModel.findOne({ slug }).populate('author');
   if (!article) {
     next(new ErrorResponse(404, "Can't find the article"));
   } else {
