@@ -2,8 +2,8 @@
 version: '3.2'
 
 services:
-  mongo:
-    image: mongo:4.4.19
+  mongodb:
+    image: mongo:4.4
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -12,7 +12,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./data:/data/db
+      - ./data/db:/data/db
 
   app:
     build: .
@@ -20,12 +20,9 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - mongo
+      - mongodb
     environment:
       NODE_ENV: production
       TOKEN_KEY: hello
-      DATABASE_URI: "# Use root/example as user/password credentials
-"
-      DATABASE_USER: root
-      DATABASE_PASSWORD: example
+      DATABASE_URI: mongodb://localhost:27017/realworld
       PORT: 3000
