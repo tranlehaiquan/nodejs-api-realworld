@@ -27,7 +27,7 @@ app.use(compression());
 if (!isProduction) {
   app.use(morgan('dev'));
 
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
 
 app.use(express.static(path.resolve(__dirname, '..', './public')));

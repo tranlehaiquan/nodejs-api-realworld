@@ -68,7 +68,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     next(new ErrorResponse(401, 'Username or password is incorrect!'));
     return;
   }
-  const userInfo: UserExport = user.toObject();
+  const userInfo = user.toObject() as UserExport;
 
   const token = await signJWT(userInfo);
 
@@ -97,7 +97,7 @@ export async function register(req: Request, res: Response, next: NextFunction):
   try {
     newUser.setPassword(password);
     const user = await newUser.save();
-    const userInfo: UserExport = user.toObject();
+    const userInfo = user.toObject() as UserExport;
     const token = await signJWT(userInfo);
 
     res.json({
