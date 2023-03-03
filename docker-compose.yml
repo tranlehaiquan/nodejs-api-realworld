@@ -1,7 +1,19 @@
 # Use root/example as user/password credentials
-version: '3.2'
+version: '3'
 
 services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongodb
+    environment:
+      NODE_ENV: development
+      TOKEN_KEY: hello
+      DATABASE_URI: mongodb://root:example@mongodb:27017
+      PORT: 3000
   mongodb:
     image: mongo:4.4
     restart: always
@@ -14,15 +26,3 @@ services:
     volumes:
       - ./data/db:/data/db
 
-  app:
-    build: .
-    restart: always
-    ports:
-      - 3000:3000
-    depends_on:
-      - mongodb
-    environment:
-      NODE_ENV: production
-      TOKEN_KEY: hello
-      DATABASE_URI: mongodb://localhost:27017/realworld
-      PORT: 3000

@@ -16,10 +16,15 @@ dotenv.config();
 // Load .env config
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || '3000';
-database();
 
 const app = express();
-app.use(express.urlencoded());
+
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+  await database();
+  next();
+});
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(compression());
 
@@ -27,7 +32,7 @@ app.use(compression());
 if (!isProduction) {
   app.use(morgan('dev'));
 
-  // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
 
 app.use(express.static(path.resolve(__dirname, '..', './public')));

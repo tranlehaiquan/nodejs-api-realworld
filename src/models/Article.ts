@@ -90,7 +90,7 @@ const ArticleShema = new Schema(
   },
 );
 
-ArticleShema.index({ slug: 1 }, { unique: true });
+ArticleShema.index({ slug: 1 });
 
 ArticleShema.pre('save', function preSave(this: Article, next) {
   if (!this.isNew) {
