@@ -6,9 +6,7 @@ import seederUsers from './users';
 dotenv.config();
 
 (async () => {
-  let databaseUri;
-  if(process.env.NODE_ENV === 'development') databaseUri = process.env.DATABASE_URI_DEVELOPMENT;
-  if(process.env.NODE_ENV === 'test') databaseUri = process.env.DATABASE_URI_TEST;
+  let databaseUri = process.env.DATABASE_URI || '';
 
   try {
     mongoose.set(

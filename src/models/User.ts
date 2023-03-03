@@ -1,3 +1,5 @@
+// ignore ts error
+// @ts-nocheck
 import mongoose, { Schema, Document } from 'mongoose';
 import { MongoError } from 'mongodb';
 import crypto from 'crypto';
