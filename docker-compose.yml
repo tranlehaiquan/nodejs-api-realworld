@@ -2,26 +2,37 @@
 version: '3'
 
 services:
-  app:
-    build: .
-    restart: always
-    ports:
-      - 3000:3000
-    depends_on:
-      - mongodb
-    environment:
-      NODE_ENV: development
-      TOKEN_KEY: hello
-      DATABASE_URI: mongodb://root:example@mongodb:27017
-      PORT: 3000
-  mongodb:
-    image: mongo:4.4
+  postgre:
+    image: postgres:15.2
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: realworld
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: realworld
     ports:
-      - 27017:27017
+      - 5432:5432
     volumes:
-      - ./data/db:/data/db
+      - ./data/postgres:/var/lib/postgresql/data
+  # app:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - mongodb
+  #   environment:
+  #     NODE_ENV: development
+  #     TOKEN_KEY: hello
+  #     DATABASE_URI: mongodb://root:example@mongodb:27017
+  #     PORT: 3000
+  # mongodb:
+  #   image: mongo:4.4
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+  #     MONGO_INITDB_DATABASE: realworld
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - ./data/db:/data/db

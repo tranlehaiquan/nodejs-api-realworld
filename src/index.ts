@@ -6,7 +6,6 @@ import compression from 'compression';
 import path from 'path';
 import cors from 'cors';
 
-import database from './database';
 import routers from './routers';
 
 import ErrorResponse from './models/Error/ErrorResponse';
@@ -19,11 +18,6 @@ const port = process.env.PORT || '3000';
 
 const app = express();
 
-app.use(async (req: Request, res: Response, next: NextFunction) => {
-  await database();
-  next();
-});
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(compression());
@@ -34,10 +28,9 @@ if (!isProduction) {
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
-
 app.use(express.static(path.resolve(__dirname, '..', './public')));
-
 app.use(cors());
+
 // define a route handler for the default home page
 app.use('/', routers);
 
