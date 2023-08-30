@@ -27,7 +27,7 @@
 		"express-validator": "^6.4.0",
 		"husky": "^8.0.3",
 		"jsonwebtoken": "^8.5.1",
-		"mongodb": "^4.14.0",
+		"mongodb": "^4.17.0",
 		"mongoose": "^5.13.20",
 		"morgan": "^1.9.1",
 		"swagger-jsdoc": "^3.5.0",
